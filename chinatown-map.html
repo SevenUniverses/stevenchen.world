@@ -60,7 +60,7 @@ canvas#gl{display:block;width:100%;height:100%;touch-action:none;outline:none}
 #title p{margin:5px 0 0;font-size:12px;color:var(--muted)}
 
 /* ---------- controls ---------- */
-#tools{position:absolute;left:max(16px,env(safe-area-inset-left,0px));top:calc(max(14px,env(safe-area-inset-top,0px)) + 78px);display:flex;flex-wrap:wrap;gap:6px;max-width:330px}
+#tools{position:absolute;left:max(16px,env(safe-area-inset-left,0px));top:calc(max(14px,env(safe-area-inset-top,0px)) + 58px);display:flex;flex-wrap:wrap;gap:6px;max-width:330px}
 .tbtn{font:600 12px/1 var(--body);border:2px solid var(--ink);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 11px;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
 .tbtn[aria-pressed="true"]{background:var(--ink);color:#fff}
 .tbtn:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
@@ -132,7 +132,6 @@ canvas#gl{display:block;width:100%;height:100%;touch-action:none;outline:none}
 
   <header id="title">
     <h1>Chinatown <span>NYC</span></h1>
-    <p>Directory map in 3D · built from OpenStreetMap · 20 places to eat · 20 landmarks</p>
   </header>
 
   <div id="tools" role="toolbar" aria-label="Map controls">
