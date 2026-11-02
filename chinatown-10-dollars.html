@@ -38,7 +38,7 @@ h2{margin:0;font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
 .dek{margin:8px 0 0;color:var(--muted);max-width:60ch}
 .note{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.04em;border:1.5px dashed var(--line);color:var(--muted);padding:8px 10px;border-radius:4px;max-width:34ch}
 
-.grid{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:20px;align-items:start}
+.grid{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:20px;align-items:stretch}
 @media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}.map-col{order:-1}}
 .panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px}
 .label{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -55,8 +55,12 @@ h2{margin:0;font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
 .field{display:grid;gap:6px;min-width:0}
 .field input,.field select{width:100%;font:inherit;font-size:1rem;color:var(--ink);background:var(--input);border:2px solid var(--line);border-radius:8px;padding:10px 12px}
 .field input:focus,.field select:focus{outline:none;border-color:var(--jade)}
-.diet{display:grid;gap:10px;border:0;margin:0;padding:12px 0 0;border-top:1px dashed var(--line);min-width:0}
-.check{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:.92rem;font-weight:600}
+.bar{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(0,1fr);gap:20px 28px;align-items:start}
+.bar-col{display:grid;gap:12px;align-content:start;min-width:0}
+.bar-col + .bar-col{border-left:1px dashed var(--line);padding-left:28px}
+@media (max-width:1000px){.bar{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.bar-col:last-child{grid-column:1 / -1;border-left:0;padding-left:0;border-top:1px dashed var(--line);padding-top:16px}}
+@media (max-width:640px){.bar{grid-template-columns:minmax(0,1fr)}.bar-col + .bar-col{border-left:0;padding-left:0;border-top:1px dashed var(--line);padding-top:16px}}
+.diet{border:0;margin:0;padding:0}.check{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:.92rem;font-weight:600}
 .check input{width:18px;height:18px;margin:1px 0 0;accent-color:var(--jade);flex:none}
 .check.disabled{cursor:not-allowed;color:var(--muted);font-weight:500}
 .check small{display:block;font-weight:400;color:var(--muted);font-size:.78rem}
@@ -81,7 +85,14 @@ h2{margin:0;font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
 .sq.full{background:var(--accent)} .sq.part{background:var(--accent-soft);box-shadow:inset 0 0 0 1.5px var(--accent)} .sq.none{background:var(--off);opacity:.5}
 
 /* Cards */
-.cards{display:grid;gap:10px;margin-top:14px}
+aside{display:flex;flex-direction:column;min-width:0}
+.list-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0 2px 8px}
+.listframe{position:relative;flex:1 1 0;min-height:520px;overflow-y:auto;overscroll-behavior:contain;
+  background:var(--block);border:1px solid var(--line);border-radius:10px;padding:10px;scrollbar-gutter:stable}
+.listframe:focus-visible{outline:3px solid var(--jade);outline-offset:2px}
+@media (max-width:900px){.listframe{flex:none;min-height:0;height:min(65vh, 600px)}}
+.listframe .group{margin:16px 4px 4px}
+.cards{display:grid;gap:10px}
 .card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer;display:grid;gap:6px;transition:border-color .15s,box-shadow .15s}
 .card:hover,.card:focus-visible{border-color:var(--ink);outline:none}
 .card.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
@@ -107,7 +118,7 @@ h2{margin:0;font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
 
 /* Map */
 .map-col{display:grid;gap:16px}
-@media (min-width:901px) and (min-height:900px){.map-col{position:sticky;top:max(16px, env(safe-area-inset-top, 0px))}}
+.map-col{align-content:start}
 .mapbox{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px}
 .scroller{overflow-x:auto}
 svg.map{display:block;width:100%;min-width:660px;height:auto}
@@ -156,39 +167,47 @@ svg.map{display:block;width:100%;min-width:660px;height:auto}
       <h1>What <span class="amt" id="amt">$10</span> buys in Chinatown</h1>
       <p class="dek">100 places to eat, from roast meat counters to street carts. Pick a budget and see where your money still gets you a meal, then get directions there.</p>
     </div>
-    <div class="note">Prices are typical spend per person. Dot positions are approximate on a simplified street map.</div>
   </header>
+
+  <section class="panel bar" aria-label="Filters">
+    <div class="bar-col">
+      <span class="label" id="bl">Your budget</span>
+      <fieldset class="chips" aria-labelledby="bl">
+        <input type="radio" name="b" id="b5" value="5"><label for="b5">$5</label>
+        <input type="radio" name="b" id="b10" value="10" checked><label for="b10">$10</label>
+        <input type="radio" name="b" id="b20" value="20"><label for="b20">$20</label>
+        <input type="radio" name="b" id="b30" value="30"><label for="b30">$30</label>
+      </fieldset>
+      <div class="field">
+        <label class="label" for="cat">Kind of food</label>
+        <select id="cat"></select>
+      </div>
+    </div>
+    <fieldset class="bar-col diet" aria-labelledby="dl">
+      <span class="label" id="dl">Dietary needs</span>
+      <label class="check"><input type="checkbox" id="veg"><span>Has a meat-free dish<small>A vegetarian dish appears in its popular dishes</small></span></label>
+      <span class="label" id="al">Skip spots known for dishes with</span>
+      <div class="toggles" role="group" aria-labelledby="al" id="allergens"></div>
+      <p class="warn">Based only on each spot's popular dishes, not full menus. Kitchens share woks and oil, so always ask staff about allergies.</p>
+    </fieldset>
+    <div class="bar-col">
+      <div class="tally"><b id="count">0</b><span>of <span id="shown">100</span> spots have food at this price</span></div>
+      <div class="ticks" id="ticks" aria-hidden="true"></div>
+      <div class="key">
+        <span><i class="sq full"></i>Whole menu fits</span>
+        <span><i class="sq part"></i>Cheaper items fit</span>
+        <span><i class="sq none"></i>Costs more</span>
+      </div>
+    </div>
+  </section>
 
   <div class="grid">
     <aside>
-      <div class="panel">
-        <span class="label" id="bl">Your budget</span>
-        <fieldset class="chips" aria-labelledby="bl">
-          <input type="radio" name="b" id="b5" value="5"><label for="b5">$5</label>
-          <input type="radio" name="b" id="b10" value="10" checked><label for="b10">$10</label>
-          <input type="radio" name="b" id="b20" value="20"><label for="b20">$20</label>
-          <input type="radio" name="b" id="b30" value="30"><label for="b30">$30</label>
-        </fieldset>
-        <div class="field">
-          <label class="label" for="cat">Kind of food</label>
-          <select id="cat"></select>
-        </div>
-        <fieldset class="diet" aria-labelledby="dl">
-          <span class="label" id="dl">Dietary needs</span>
-          <label class="check"><input type="checkbox" id="veg"><span>Has a meat-free dish<small>A vegetarian dish appears in its popular dishes</small></span></label>          <span class="label" id="al">Skip spots known for dishes with</span>
-          <div class="toggles" role="group" aria-labelledby="al" id="allergens"></div>
-          <p class="warn">Based only on each spot's popular dishes, not full menus. Kitchens share woks and oil, so always ask staff about allergies.</p>
-        </fieldset>
-        <div class="tally"><b id="count">0</b><span>of <span id="shown">100</span> spots have food at this price</span></div>
-        <div class="ticks" id="ticks" aria-hidden="true"></div>
-        <div class="key">
-          <span><i class="sq full"></i>Whole menu fits</span>
-          <span><i class="sq part"></i>Cheaper items fit</span>
-          <span><i class="sq none"></i>Costs more</span>
-        </div>
+      <div class="list-head"><span class="label" id="listlabel">Spots at this budget</span><span class="hint">Scroll inside the list</span></div>
+      <div class="listframe" id="listframe" tabindex="0" aria-labelledby="listlabel">
+        <div class="cards" id="cards"></div>
+        <div class="group" id="over"></div>
       </div>
-      <div class="cards" id="cards"></div>
-      <div class="group" id="over"></div>
     </aside>
 
     <div class="map-col">
@@ -454,8 +473,8 @@ function select(id, fromMap){
   document.querySelectorAll("[data-card]").forEach(r=>r.classList.toggle("sel", +r.dataset.card===selected));
   showTag(selected ? byId(selected) : null);
   if (fromMap && selected){
-    const el = document.querySelector(`[data-card="${selected}"]`);
-    if (el) el.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto":"smooth", block:"nearest"});
+    const el = document.querySelector(`[data-card="${selected}"]`), frame = $("#listframe");
+    if (el) frame.scrollTo({top: Math.max(0, el.offsetTop - 10), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto":"smooth"});
   }
 }
 
@@ -470,6 +489,7 @@ function rangeBar(s){
 function render(){
   $("#amt").textContent = "$" + budget;
   const pool = SHOPS.filter(passes);
+  $("#listframe").scrollTop = 0;
   const fits = pool.filter(s=>status(s)!=="none")
     .sort((a,b)=> (status(a)==="full"?0:1)-(status(b)==="full"?0:1) || orders(b)-orders(a) || a.lo-b.lo || a.name.localeCompare(b.name));
   const over = pool.filter(s=>status(s)==="none").sort((a,b)=>a.lo-b.lo);
