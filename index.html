@@ -67,8 +67,17 @@
     .stage[hidden] { display: none; }
     .stage.home { justify-content: center; }
     .stage.home img { width: min(480px, 80vw); height: auto; }
+    .credit-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 8px 24px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .credit-wip { margin: 0; margin-left: auto; font-size: 12px; font-weight: 500; letter-spacing: 0.1em; white-space: nowrap; }
     .credit {
-      margin: 10px 0 0;
+      margin: 0;
       text-align: left;
       text-transform: none;
       letter-spacing: 0.02em;
@@ -231,6 +240,7 @@
         <!-- Chinatown 1: 3D map -->
         <div class="part-view" id="chinatown-1">
           <iframe data-src="chinatown-map.html?v=2" title="Chinatown NYC 3D map" allow="fullscreen"></iframe>
+          <div class="credit-row">
           <p class="credit">
             Based on the Chinatown NYC Directory Map by the Chinatown Partnership
             (<a href="https://chinatown.nyc/directory-map" target="_blank" rel="noopener">chinatown.nyc/directory-map</a>).
@@ -238,6 +248,8 @@
             Map data © OpenStreetMap contributors
             (<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">openstreetmap.org/copyright</a>).
           </p>
+          <p class="credit-wip">Work in progress...</p>
+          </div>
         </div>
 
         <!-- Chinatown 2: What $10 buys in Chinatown -->
