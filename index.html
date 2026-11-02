@@ -87,8 +87,8 @@
     .credit a { text-decoration: underline; text-underline-offset: 2px; }
     .wip { margin: 0; font-size: 20px; font-weight: 500; letter-spacing: 0.12em; }
 
-    /* Noodle cup in the top-left: goes back to the home page */
-    .home-btn { display: inline-block; justify-self: start; margin: -20px 0 -24px -8px; transition: transform 0.15s; }
+    /* Mascot in the top-left: goes back to the home page */
+    .home-btn { display: inline-block; justify-self: start; margin: -8px 0 -24px -8px; transition: transform 0.15s; }
     .home-btn img { display: block; height: 100px; width: auto; }
     .home-btn:hover { transform: rotate(-6deg) scale(1.05); }
     .home-btn:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; }
@@ -203,7 +203,7 @@
       <header>
       <div class="top">
         <a href="./" class="home-btn" id="home-btn" aria-label="Home">
-          <img src="home-button.gif" alt="">
+          <img src="home-button.gif?v=2" alt="">
         </a>
         <nav>
           <button type="button" id="projects-btn" aria-expanded="false" aria-controls="projects-menu">Projects</button>
@@ -318,7 +318,7 @@
       });
     });
 
-    // Noodle cup: back to the home page.
+    // Top-left mascot: back to the home page.
     document.getElementById('home-btn').addEventListener('click', function (e) {
       e.preventDefault();
       document.querySelectorAll('.stage').forEach(function (s) { s.hidden = s.id !== 'home'; });
