@@ -65,6 +65,8 @@
     /* Center area where a chosen project is shown */
     .stage { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; padding: 24px 0; }
     .stage[hidden] { display: none; }
+    .stage.home { justify-content: center; }
+    .stage.home img { width: min(480px, 80vw); height: auto; }
     .stage h1 { margin: 0; font-size: clamp(32px, 5vw, 56px); font-weight: 700; line-height: 1; letter-spacing: 0.04em; }
     /* Title with circled part numbers (1, 2, ...) */
     .title-row { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
@@ -192,6 +194,11 @@
         <a href="#">Project Five</a>
       </div>
       </header>
+
+      <!-- Home: shown when no project is picked -->
+      <main class="stage home" id="home">
+        <img src="home.gif" alt="A yellow chick calmly sipping from a mug next to a laptop on fire">
+      </main>
 
       <!-- Chinatown: shown in the center when picked from the Projects menu -->
       <main class="stage" id="chinatown" hidden>
