@@ -67,6 +67,13 @@
     .stage[hidden] { display: none; }
     .stage.home { justify-content: center; }
     .stage.home img { width: min(480px, 80vw); height: auto; }
+    .wip { margin: 0; font-size: 20px; font-weight: 500; letter-spacing: 0.12em; }
+
+    /* Noodle cup in the top-left: goes back to the home page */
+    .home-btn { display: inline-block; justify-self: start; margin: -20px 0 -24px -8px; transition: transform 0.15s; }
+    .home-btn img { display: block; height: 100px; width: auto; }
+    .home-btn:hover { transform: rotate(-6deg) scale(1.05); }
+    .home-btn:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; }
     .stage h1 { margin: 0; font-size: clamp(32px, 5vw, 56px); font-weight: 700; line-height: 1; letter-spacing: 0.04em; }
     /* Title with circled part numbers (1, 2, ...) */
     .title-row { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
@@ -177,7 +184,9 @@
     <section class="hero">
       <header>
       <div class="top">
-        <div></div>
+        <a href="./" class="home-btn" id="home-btn" aria-label="Home">
+          <img src="home-button.gif" alt="">
+        </a>
         <nav>
           <button type="button" id="projects-btn" aria-expanded="false" aria-controls="projects-menu">Projects</button>
           <a href="#contact">About</a>
@@ -198,6 +207,7 @@
       <!-- Home: shown when no project is picked -->
       <main class="stage home" id="home">
         <img src="home.gif" alt="A yellow chick calmly sipping from a mug next to a laptop on fire">
+        <p class="wip">Work in Progress....</p>
       </main>
 
       <!-- Chinatown: shown in the center when picked from the Projects menu -->
@@ -279,6 +289,13 @@
         });
         loadFrames(stage);
       });
+    });
+
+    // Noodle cup: back to the home page.
+    document.getElementById('home-btn').addEventListener('click', function (e) {
+      e.preventDefault();
+      document.querySelectorAll('.stage').forEach(function (s) { s.hidden = s.id !== 'home'; });
+      setOpen(false);
     });
 
     document.addEventListener('keydown', function (e) {
