@@ -1,0 +1,545 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>What $10 Buys in Chinatown</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&text=%E8%8F%AF%E5%9F%A0&display=swap">
+<style>
+/* Layout: sidebar with budget + food-type filters and a list of spots; schematic street map plus a "Get there" panel on the right. */
+:root{
+  --bg:#ECEFEA; --paper:#FBFCF9; --ink:#1D2824; --muted:#5E6B66; --line:#C9D1CB;
+  --block:#DCE2DC; --street:#FFFFFF; --park:#BCD5BF; --bridge:#9AA8A1;
+  --accent:#D3362A; --accent-ink:#FFFFFF; --accent-soft:#F3C9C4; --jade:#2E7458; --off:#A8B3AD; --input:#FFFFFF;
+  --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --f-han:"Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --f-zh:"PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Heiti TC", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121816; --paper:#1A2220; --ink:#E6ECE8; --muted:#97A49E; --line:#2E3A36;
+  --block:#1E2724; --street:#33403B; --park:#24402F; --bridge:#5A6A63;
+  --accent:#FF5B48; --accent-ink:#1A0D0B; --accent-soft:#5A2722; --jade:#5FBF94; --off:#4E5C56; --input:#121816; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121816; --paper:#1A2220; --ink:#E6ECE8; --muted:#97A49E; --line:#2E3A36;
+  --block:#1E2724; --street:#33403B; --park:#24402F; --bridge:#5A6A63;
+  --accent:#FF5B48; --accent-ink:#1A0D0B; --accent-soft:#5A2722; --jade:#5FBF94; --off:#4E5C56; --input:#121816; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-display);font-size:15px;line-height:1.45;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 40px}
+.wrap{max-width:1360px;margin:0 auto;display:grid;gap:20px}
+
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+.han{font-family:var(--f-han);font-weight:900;font-size:2.4rem;line-height:1;color:var(--accent);letter-spacing:.04em}
+h1{margin:0;font-size:clamp(2rem,5vw,3.6rem);font-weight:800;line-height:.98;letter-spacing:-.02em;text-wrap:balance}
+h1 .amt{color:var(--accent);font-variant-numeric:tabular-nums}
+h2{margin:0;font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+.dek{margin:8px 0 0;color:var(--muted);max-width:60ch}
+.note{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.04em;border:1.5px dashed var(--line);color:var(--muted);padding:8px 10px;border-radius:4px;max-width:34ch}
+
+.grid{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}.map-col{order:-1}}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px}
+.label{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;border:0;margin:0;padding:0;min-width:0}
+.chips input{position:absolute;opacity:0;pointer-events:none}
+.chips label{display:block;text-align:center;padding:10px 0;border:2px solid var(--ink);border-radius:999px;
+  font-weight:800;font-size:1.15rem;cursor:pointer;font-variant-numeric:tabular-nums;transition:background .15s,color .15s,transform .15s}
+.chips.small label{font-size:.85rem;padding:7px 0;font-weight:700}
+.chips label:hover{transform:translateY(-1px)}
+.chips input:checked + label{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chips.small input:checked + label{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.chips input:focus-visible + label{outline:3px solid var(--jade);outline-offset:2px}
+.field{display:grid;gap:6px;min-width:0}
+.field input,.field select{width:100%;font:inherit;font-size:1rem;color:var(--ink);background:var(--input);border:2px solid var(--line);border-radius:8px;padding:10px 12px}
+.field input:focus,.field select:focus{outline:none;border-color:var(--jade)}
+.diet{display:grid;gap:10px;border:0;margin:0;padding:12px 0 0;border-top:1px dashed var(--line);min-width:0}
+.check{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:.92rem;font-weight:600}
+.check input{width:18px;height:18px;margin:1px 0 0;accent-color:var(--jade);flex:none}
+.check.disabled{cursor:not-allowed;color:var(--muted);font-weight:500}
+.check small{display:block;font-weight:400;color:var(--muted);font-size:.78rem}
+.toggles{display:flex;flex-wrap:wrap;gap:6px}
+.toggles input{position:absolute;opacity:0;pointer-events:none}
+.toggles label{display:inline-block;padding:5px 11px;border:1.5px solid var(--line);border-radius:999px;font-size:.84rem;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s}
+.toggles input:checked + label{background:var(--ink);border-color:var(--ink);color:var(--paper);text-decoration:line-through;text-decoration-thickness:1.5px}
+.toggles input:focus-visible + label{outline:3px solid var(--jade);outline-offset:2px}
+.warn{font-size:.78rem;color:var(--muted);border-left:3px solid var(--accent);padding:2px 0 2px 10px;margin:0}
+.tags{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.76rem}
+.tag-veg{color:var(--jade);font-weight:600}
+.tag-al{color:var(--muted)}
+.tally{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.tally b{font-size:2.2rem;line-height:1;font-variant-numeric:tabular-nums}
+.ticks{display:grid;grid-template-columns:repeat(25,1fr);gap:3px}
+.ticks i{aspect-ratio:1;border-radius:2px;background:var(--off);opacity:.35;transition:background .2s,opacity .2s}
+.ticks i.full{background:var(--accent);opacity:1}
+.ticks i.part{background:var(--accent-soft);box-shadow:inset 0 0 0 1.5px var(--accent);opacity:1}
+.key{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--muted);align-items:center}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.sq{width:11px;height:11px;border-radius:2px;display:inline-block}
+.sq.full{background:var(--accent)} .sq.part{background:var(--accent-soft);box-shadow:inset 0 0 0 1.5px var(--accent)} .sq.none{background:var(--off);opacity:.5}
+
+/* Cards */
+.cards{display:grid;gap:10px;margin-top:14px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer;display:grid;gap:6px;transition:border-color .15s,box-shadow .15s}
+.card:hover,.card:focus-visible{border-color:var(--ink);outline:none}
+.card.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.c-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.c-name{font-weight:800;font-size:1.02rem;line-height:1.2;min-width:0}
+.c-zh{font-family:var(--f-zh);font-weight:500;color:var(--muted);font-size:.9rem;margin-left:4px}
+.pill{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:3px;white-space:nowrap}
+.pill.full{background:var(--accent);color:var(--accent-ink)}
+.pill.part{border:1.5px solid var(--accent);color:var(--accent)}
+.c-meta{font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
+.c-dishes{font-size:.85rem;color:var(--ink);opacity:.85}
+.c-row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.c-price{font-family:var(--f-mono);font-size:.78rem;font-variant-numeric:tabular-nums}
+.c-price b{color:var(--accent)}
+.range{display:block;width:100%;height:18px}
+.range .trk{fill:var(--block)}
+.range .fill{fill:var(--accent);opacity:.85}
+.range .bud{stroke:var(--ink);stroke-width:2}
+.linkbtn{font:inherit;font-size:.82rem;font-weight:700;color:var(--jade);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.linkbtn:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
+.group{margin-top:22px;display:grid;gap:6px}
+.group p{margin:0;color:var(--muted);font-size:.85rem}
+
+/* Map */
+.map-col{display:grid;gap:16px}
+@media (min-width:901px) and (min-height:900px){.map-col{position:sticky;top:max(16px, env(safe-area-inset-top, 0px))}}
+.mapbox{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px}
+.scroller{overflow-x:auto}
+svg.map{display:block;width:100%;min-width:660px;height:auto}
+.st{stroke:var(--street);fill:none;stroke-linecap:round}
+.st-l{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;fill:var(--muted);text-transform:uppercase}
+.st-l.big{font-size:13px;font-weight:600;fill:var(--ink)}
+.dot{cursor:pointer;outline:none;transition:opacity .2s}
+.dot .halo{fill:var(--accent);opacity:0;transition:opacity .15s}
+.dot .core{fill:var(--paper);stroke:var(--off);stroke-width:2;transition:fill .2s,stroke .2s}
+.dot.full .core{fill:var(--accent);stroke:var(--paper);stroke-width:1.5}
+.dot.part .core{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2.5}
+.dot.none{opacity:.55}
+.dot.hide{opacity:.08;pointer-events:none}
+.dot .pop{transform-box:fill-box;transform-origin:center;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.dot.full .pop{transform:scale(1.2)}
+.dot.sel .halo,.dot:focus-visible .halo{opacity:.28}
+.dot .dest{fill:none;stroke:var(--jade);stroke-width:3;opacity:0}
+.dot.isdest .dest{opacity:1}
+#tag rect{fill:var(--ink)}
+#tag text{fill:var(--bg);font-family:var(--f-display);font-weight:700;font-size:14px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;font-size:.8rem;color:var(--muted);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:50%;display:inline-block}
+.sw.full{background:var(--accent)}
+.sw.part{background:var(--accent-soft);border:2px solid var(--accent)}
+.sw.none{border:2px solid var(--off);background:var(--paper)}
+.sw.dest{border:3px solid var(--jade)}
+
+/* Get there */
+.go-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:560px){.go-grid{grid-template-columns:minmax(0,1fr)}}
+.hint{font-size:.78rem;color:var(--muted)}
+.subway{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.88rem}
+.bullet{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:700;font-size:.8rem;color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--jade);color:var(--paper);font-weight:800;font-size:1rem;text-decoration:none;padding:12px 18px;border-radius:999px;border:0}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.go-row{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="han" aria-hidden="true">華埠</div>
+      <h1>What <span class="amt" id="amt">$10</span> buys in Chinatown</h1>
+      <p class="dek">100 places to eat, from roast meat counters to street carts. Pick a budget and see where your money still gets you a meal, then get directions there.</p>
+    </div>
+    <div class="note">Prices are typical spend per person. Dot positions are approximate on a simplified street map.</div>
+  </header>
+
+  <div class="grid">
+    <aside>
+      <div class="panel">
+        <span class="label" id="bl">Your budget</span>
+        <fieldset class="chips" aria-labelledby="bl">
+          <input type="radio" name="b" id="b5" value="5"><label for="b5">$5</label>
+          <input type="radio" name="b" id="b10" value="10" checked><label for="b10">$10</label>
+          <input type="radio" name="b" id="b20" value="20"><label for="b20">$20</label>
+          <input type="radio" name="b" id="b30" value="30"><label for="b30">$30</label>
+        </fieldset>
+        <div class="field">
+          <label class="label" for="cat">Kind of food</label>
+          <select id="cat"></select>
+        </div>
+        <fieldset class="diet" aria-labelledby="dl">
+          <span class="label" id="dl">Dietary needs</span>
+          <label class="check"><input type="checkbox" id="veg"><span>Has a meat-free dish<small>A vegetarian dish appears in its popular dishes</small></span></label>          <span class="label" id="al">Skip spots known for dishes with</span>
+          <div class="toggles" role="group" aria-labelledby="al" id="allergens"></div>
+          <p class="warn">Based only on each spot's popular dishes, not full menus. Kitchens share woks and oil, so always ask staff about allergies.</p>
+        </fieldset>
+        <div class="tally"><b id="count">0</b><span>of <span id="shown">100</span> spots have food at this price</span></div>
+        <div class="ticks" id="ticks" aria-hidden="true"></div>
+        <div class="key">
+          <span><i class="sq full"></i>Whole menu fits</span>
+          <span><i class="sq part"></i>Cheaper items fit</span>
+          <span><i class="sq none"></i>Costs more</span>
+        </div>
+      </div>
+      <div class="cards" id="cards"></div>
+      <div class="group" id="over"></div>
+    </aside>
+
+    <div class="map-col">
+      <div class="mapbox">
+        <div class="scroller">
+        <svg class="map" viewBox="0 -95 1120 865" role="img" aria-label="Simplified street map of Manhattan's Chinatown with eateries marked">
+          <rect y="-95" width="1120" height="865" fill="var(--block)"/>
+          <rect x="228" y="440" width="84" height="162" rx="4" fill="var(--park)"/>
+          <text class="st-l" x="270" y="525" text-anchor="middle" transform="rotate(-90 270 525)" style="fill:var(--jade)">Columbus Park</text>
+          <path d="M612 352 L 1115 404" stroke="var(--bridge)" stroke-width="30" stroke-dasharray="6 6" fill="none" opacity=".55"/>
+          <g class="st" stroke-width="16">
+            <path d="M40 10 H 1100"/><path d="M40 110 H 1100"/><path d="M40 220 H 1100"/>
+            <path d="M220 430 H 600"/><path d="M420 510 H 600"/><path d="M320 560 H 420"/><path d="M40 610 H 320"/>
+            <path d="M120 -85 V 610"/><path d="M220 -40 V 610"/><path d="M320 -85 V 640"/><path d="M420 -85 V 665"/>
+            <path d="M510 -85 V 430"/><path d="M700 -85 V 330"/><path d="M770 -85 V 442"/><path d="M840 -85 V 452"/>
+            <path d="M910 -85 V 461"/><path d="M980 -85 V 330"/><path d="M1050 -85 V 330"/>
+            <path d="M600 420 L 1110 487"/><path d="M600 655 L 1110 534"/><path d="M600 655 L 745 770"/><path d="M110 770 L 575 660"/>
+            <path id="doyers" d="M470 510 C 480 562 540 562 600 600" stroke-width="11"/>
+          </g>
+          <path class="st" d="M600 -85 V 655" stroke-width="24"/>
+          <path class="st" d="M30 330 H 1105" stroke-width="28"/>
+          <circle cx="595" cy="655" r="30" fill="var(--street)"/>
+          <g>
+            <text class="st-l big" x="170" y="335" text-anchor="middle">Canal St</text>
+            <text class="st-l big" x="735" y="335" text-anchor="middle">Canal St</text>
+            <text class="st-l big" x="600" y="470" text-anchor="middle" transform="rotate(-90 600 470)" dy="4">Bowery</text>
+            <text class="st-l big" x="600" y="165" text-anchor="middle" transform="rotate(-90 600 165)" dy="4">Bowery</text>
+            <text class="st-l" x="170" y="14" text-anchor="middle">Broome St</text>
+            <text class="st-l" x="170" y="114" text-anchor="middle">Grand St</text>
+            <text class="st-l" x="650" y="114" text-anchor="middle">Grand St</text>
+            <text class="st-l" x="170" y="224" text-anchor="middle">Hester St</text>
+            <text class="st-l" x="650" y="224" text-anchor="middle">Hester St</text>
+            <text class="st-l" x="270" y="434" text-anchor="middle">Bayard</text>
+            <text class="st-l" x="560" y="514" text-anchor="middle">Pell</text>
+            <text class="st-l" x="370" y="564" text-anchor="middle">Mosco</text>
+            <text class="st-l" x="170" y="614" text-anchor="middle">Worth St</text>
+            <text class="st-l" font-size="9"><textPath href="#doyers" startOffset="70%">Doyers</textPath></text>
+            <g>
+              <text class="st-l" x="120" y="-50" text-anchor="middle" transform="rotate(-90 120 -50)" dy="4">Centre</text>
+              <text class="st-l" x="220" y="160" text-anchor="middle" transform="rotate(-90 220 160)" dy="4">Baxter</text>
+              <text class="st-l" x="320" y="-45" text-anchor="middle" transform="rotate(-90 320 -45)" dy="4">Mulberry</text>
+              <text class="st-l" x="420" y="-55" text-anchor="middle" transform="rotate(-90 420 -55)" dy="4">Mott</text>
+              <text class="st-l" x="510" y="-45" text-anchor="middle" transform="rotate(-90 510 -45)" dy="4">Elizabeth</text>
+              <text class="st-l" x="700" y="-45" text-anchor="middle" transform="rotate(-90 700 -45)" dy="4">Chrystie</text>
+              <text class="st-l" x="770" y="-45" text-anchor="middle" transform="rotate(-90 770 -45)" dy="4">Forsyth</text>
+              <text class="st-l" x="840" y="-45" text-anchor="middle" transform="rotate(-90 840 -45)" dy="4">Eldridge</text>
+              <text class="st-l" x="910" y="-50" text-anchor="middle" transform="rotate(-90 910 -50)" dy="4">Allen</text>
+              <text class="st-l" x="980" y="-45" text-anchor="middle" transform="rotate(-90 980 -45)" dy="4">Orchard</text>
+              <text class="st-l" x="1050" y="-50" text-anchor="middle" transform="rotate(-90 1050 -50)" dy="4">Essex</text>
+            </g>
+            <text class="st-l" x="700" y="433" text-anchor="middle" transform="rotate(7.5 700 433)" dy="4">Division St</text>
+            <text class="st-l" x="740" y="622" text-anchor="middle" transform="rotate(-13.3 740 622)" dy="4">East Broadway</text>
+            <text class="st-l" x="690" y="714" text-anchor="middle" transform="rotate(38.4 690 714)" dy="4">Catherine</text>
+            <text class="st-l" x="330" y="718" text-anchor="middle" transform="rotate(-13.3 330 718)" dy="4">Park Row</text>
+            <text class="st-l" x="595" y="705" text-anchor="middle" style="fill:var(--ink)">Chatham Sq</text>
+            <text class="st-l" x="1000" y="388" text-anchor="middle" transform="rotate(6 1000 388)" style="fill:var(--ink);opacity:.7">Manhattan Bridge</text>
+          </g>
+          <g transform="translate(1080 720)" aria-hidden="true">
+            <path d="M0 -22 L7 0 L0 -5 L-7 0 Z" fill="var(--ink)"/>
+            <text x="0" y="16" text-anchor="middle" class="st-l" style="fill:var(--ink)">N</text>
+          </g>
+          <g id="dots"></g>
+          <g id="tag" visibility="hidden" pointer-events="none"><rect rx="5" height="26"/><text y="18"></text></g>
+        </svg>
+        </div>
+        <div class="legend">
+          <span><i class="sw full"></i>Whole menu fits</span>
+          <span><i class="sw part"></i>Cheaper items fit</span>
+          <span><i class="sw none"></i>Costs more</span>
+          <span><i class="sw dest"></i>Your destination</span>
+        </div>
+      </div>
+
+      <section class="panel" aria-labelledby="goh">
+        <h2 id="goh">Get there</h2>
+        <div class="go-grid">
+          <div class="field">
+            <label class="label" for="from">Starting from</label>
+            <input id="from" type="text" autocomplete="street-address" placeholder="e.g. 136 W 21st St, New York">
+            <span class="hint">Leave blank to start from where you are.</span>
+          </div>
+          <div class="field">
+            <label class="label" for="to">Going to</label>
+            <select id="to"></select>
+            <div class="subway" id="subway"></div>
+          </div>
+        </div>
+        <span class="label" id="ml">How you're getting there</span>
+        <fieldset class="chips small" aria-labelledby="ml">
+          <input type="radio" name="m" id="mt" value="transit" checked><label for="mt">Subway</label>
+          <input type="radio" name="m" id="mw" value="walking"><label for="mw">Walk</label>
+          <input type="radio" name="m" id="mb" value="bicycling"><label for="mb">Bike</label>
+          <input type="radio" name="m" id="md" value="driving"><label for="md">Drive</label>
+        </fieldset>
+        <div class="go-row">
+          <a class="btn" id="goBtn" href="#" target="_blank" rel="noopener">Open quickest route ↗</a>
+          <span class="hint">Google Maps works out the fastest route and opens in a new tab.</span>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+const SHOPS = [{"id": 1, "name": "Wah Fung No. 1 Fast Food", "zh": "華豐快餐", "cat": "Cantonese Roast Meats", "addr": "79 Chrystie St", "lvl": "$", "dishes": "Char Siu Roast Pork Box, Roast Duck Rice, Crispy Pork Belly", "lo": 6, "hi": 10}, {"id": 2, "name": "Big Wong", "zh": "大旺", "cat": "Cantonese Roast Meats", "addr": "67 Mott St", "lvl": "$", "dishes": "Roast Pork & Duck Combo Rice, Wonton Soup, Hot Congee", "lo": 8, "hi": 14}, {"id": 3, "name": "Great NY Noodletown", "zh": "紐約大麵館", "cat": "Cantonese Roast Meats", "addr": "28 Bowery", "lvl": "$$", "dishes": "Ginger Scallion Noodles, Roast Duck, Salt & Pepper Squid", "lo": 10, "hi": 18}, {"id": 4, "name": "Hay Hay Roasted", "zh": "喜喜燒臘", "cat": "Cantonese Roast Meats", "addr": "81 Mott St", "lvl": "$$", "dishes": "Crispy Roast Pig, Soy Sauce Chicken, Char Siu", "lo": 12, "hi": 20}, {"id": 5, "name": "King's Kitchen", "zh": "帝皇寶", "cat": "Cantonese Roast Meats", "addr": "92 Elizabeth St", "lvl": "$$", "dishes": "Claypot Rice, Roast Meats Combo, Stewed Beef Tendon", "lo": 12, "hi": 22}, {"id": 6, "name": "Wu's Wonton King", "zh": "和樂鮮館", "cat": "Cantonese Roast Meats", "addr": "165 East Broadway", "lvl": "$$", "dishes": "Wonton Soup, Roast Duck over Rice, Dungeness Crab", "lo": 14, "hi": 25}, {"id": 7, "name": "Corner 28 / Deluxe Green Bo Window", "zh": "綠波廊外賣", "cat": "Cantonese Roast Meats", "addr": "66 Bayard St", "lvl": "$", "dishes": "Roast Duck Buns, Pork Chow Mein, Char Siu Rice", "lo": 5, "hi": 10}, {"id": 8, "name": "Bo Ky Restaurant", "zh": "波記潮州粉麵", "cat": "Cantonese Roast Meats", "addr": "80 Bayard St", "lvl": "$", "dishes": "Teochew Roast Duck, Stewed Pork Organ Soup, Glass Noodles", "lo": 8, "hi": 15}, {"id": 9, "name": "Chinatown Noodle Cafe", "zh": "唐人街麵館", "cat": "Cantonese Roast Meats", "addr": "75 Mott St", "lvl": "$$", "dishes": "Roast Pork Rice Plate, Beef Chow Fun, Wonton Noodles", "lo": 10, "hi": 16}, {"id": 10, "name": "Hong Kong Station", "zh": "香港站", "cat": "Cantonese Roast Meats", "addr": "45 Division St", "lvl": "$", "dishes": "Curry Fish Ball Rice Bowl, Roast Duck Cart Noodles, Milk Tea", "lo": 7, "hi": 12}, {"id": 11, "name": "Sun Sai Gai (Express Counter)", "zh": "新世界快餐", "cat": "Cantonese Roast Meats", "addr": "22 Chatham Sq", "lvl": "$", "dishes": "Roast Duck over Rice, Char Siu Box, Braised Pork Ribs", "lo": 7, "hi": 12}, {"id": 12, "name": "Chatham Square Roast Express", "zh": "廣場燒臘", "cat": "Cantonese Roast Meats", "addr": "8 Chatham Sq", "lvl": "$", "dishes": "Soy Sauce Chicken Rice, Crispy Roast Pork, Stewed Cabbage", "lo": 6, "hi": 11}, {"id": 13, "name": "Bayard BBQ House", "zh": "巴查燒臘館", "cat": "Cantonese Roast Meats", "addr": "52 Bayard St", "lvl": "$", "dishes": "Char Siu Sou, Roasted Goose (Seasonal), Hainan Chicken", "lo": 9, "hi": 16}, {"id": 14, "name": "Ming's BBQ Fast Food", "zh": "明記燒臘", "cat": "Cantonese Roast Meats", "addr": "112 Bowery", "lvl": "$", "dishes": "Two-Item Roast Meat Rice Box, Wonton Noodle Broth", "lo": 7, "hi": 12}, {"id": 15, "name": "Shu Jiao Fu Zhou", "zh": "福州福味", "cat": "Dumplings & Noodles", "addr": "295 Grand St", "lvl": "$", "dishes": "Pork & Chive Dumplings, Peanut Sauce Noodles, Beef Soup", "lo": 3, "hi": 7}, {"id": 16, "name": "King Dumpling", "zh": "餃子王", "cat": "Dumplings & Noodles", "addr": "74 Allen St", "lvl": "$", "dishes": "Fried Pork Dumplings, Sesame Pancake Sandwich, Wonton Soup", "lo": 4, "hi": 8}, {"id": 17, "name": "Jin Mei Dumpling", "zh": "金美餃子", "cat": "Dumplings & Noodles", "addr": "118 Henry St", "lvl": "$", "dishes": "Boiled Pork Dumplings, Pan-Fried Buns, Hot Soup Noodles", "lo": 3, "hi": 6}, {"id": 18, "name": "Super Taste", "zh": "美味手工麵", "cat": "Dumplings & Noodles", "addr": "26 Eldridge St", "lvl": "$", "dishes": "Hand-Pulled Beef Noodle Soup, Fried Dumplings, Pork Belly Bao", "lo": 7, "hi": 12}, {"id": 19, "name": "Tasty Hand-Pulled Noodles", "zh": "美味拉麵", "cat": "Dumplings & Noodles", "addr": "1 Doyers St", "lvl": "$", "dishes": "Pan-Fried Hand-Cut Noodles, Roasted Duck Soup Noodles", "lo": 9, "hi": 15}, {"id": 20, "name": "Joe's Steamed Rice Rolls", "zh": "腸粉王", "cat": "Dumplings & Noodles", "addr": "136 Baxter St", "lvl": "$", "dishes": "Beef Rice Roll with Egg, Pork Cheung Fun, Curry Fish Balls", "lo": 5, "hi": 9}, {"id": 21, "name": "Tonii's Fresh Rice Noodle", "zh": "通利磨坊", "cat": "Dumplings & Noodles", "addr": "83 Bayard St", "lvl": "$", "dishes": "Steamed Rice Rolls, Sweet Tofu Pudding (Douhua), Fish Balls", "lo": 4, "hi": 8}, {"id": 22, "name": "Yi Ji Shi Mo", "zh": "壹吉石磨腸粉", "cat": "Dumplings & Noodles", "addr": "28 Elizabeth St", "lvl": "$", "dishes": "Stone-Milled Shrimp Rice Roll, Pork & Egg Cheung Fun", "lo": 5, "hi": 9}, {"id": 23, "name": "Xi'an Famous Foods", "zh": "西安名吃", "cat": "Dumplings & Noodles", "addr": "45 Bayard St", "lvl": "$$", "dishes": "Spicy Cumin Lamb Noodles, Pork Flatbread Burger, Liangpi Noodles", "lo": 10, "hi": 16}, {"id": 24, "name": "Lam Zhou Handpulled Noodle", "zh": "蘭州拉麵", "cat": "Dumplings & Noodles", "addr": "40 Bowery", "lvl": "$", "dishes": "Beef Tendon Noodle Soup, Fried Pork Dumplings", "lo": 7, "hi": 12}, {"id": 25, "name": "Lan Zhou Hand Pulled Noodle", "zh": "新蘭州拉麵", "cat": "Dumplings & Noodles", "addr": "136 Broome St", "lvl": "$", "dishes": "Oxtail Noodle Soup, Fried Dumplings, Stir-Fried Knife Cut Noodles", "lo": 8, "hi": 13}, {"id": 26, "name": "Vanessa's Dumpling House", "zh": "金紅餃子", "cat": "Dumplings & Noodles", "addr": "220 Eldridge St", "lvl": "$", "dishes": "Sesame Pancake Sandwich, Fried Pork Buns, Boiled Dumplings", "lo": 4, "hi": 9}, {"id": 27, "name": "Fried Dumpling", "zh": "鍋貼店", "cat": "Dumplings & Noodles", "addr": "106 Mosco St", "lvl": "$", "dishes": "5-for-$2 Fried Pork Dumplings, Hot Pork Bun, Hot Soup", "lo": 2, "hi": 5}, {"id": 28, "name": "North Dumpling", "zh": "北方餃子館", "cat": "Dumplings & Noodles", "addr": "27A Essex St", "lvl": "$", "dishes": "Pork & Chive Fried Dumplings, Pancake Sandwiches, Hot Sour Soup", "lo": 3, "hi": 7}, {"id": 29, "name": "Bao Noodle House", "zh": "包麵館", "cat": "Dumplings & Noodles", "addr": "110 Bowery", "lvl": "$$", "dishes": "Brisket Noodle Soup, Pork Bao, Spicy Wontons", "lo": 10, "hi": 16}, {"id": 30, "name": "Silk Noodle Bar", "zh": "絲路粉館", "cat": "Dumplings & Noodles", "addr": "12 Eldridge St", "lvl": "$", "dishes": "Luosifen Snail Rice Noodles, Guangxi Spicy Noodles", "lo": 9, "hi": 14}, {"id": 31, "name": "Mei Lài Xuan", "zh": "美來香", "cat": "Dumplings & Noodles", "addr": "62 Bayard St", "lvl": "$", "dishes": "Pan-Fried Pork Buns (Shengjian Bao), Wonton Broth Noodles", "lo": 6, "hi": 11}, {"id": 32, "name": "Spicy Village", "zh": "莊嚴大盤雞", "cat": "Dumplings & Noodles", "addr": "68 Forsyth St", "lvl": "$$", "dishes": "Henan Big Tray Chicken, Hui Mian Wide Noodles, Spicy Lamb Huoshao", "lo": 10, "hi": 18}, {"id": 33, "name": "Noodle Village", "zh": "鮮麵莊", "cat": "Dumplings & Noodles", "addr": "13 Mott St", "lvl": "$$", "dishes": "Xiao Long Bao, Wonton Noodle Soup, Sampan Congee", "lo": 10, "hi": 17}, {"id": 34, "name": "Very Fresh Noodles (Chinatown Pop-Up)", "zh": "甚鮮麵館", "cat": "Dumplings & Noodles", "addr": "98 Mott St Stall 4", "lvl": "$$", "dishes": "Biang Biang Noodles, Vegan Spicy Cumin Noodles, Dan Dan", "lo": 11, "hi": 16}, {"id": 35, "name": "Shu Jiao Fu Zhou Annex", "zh": "福州福味二店", "cat": "Dumplings & Noodles", "addr": "295 Grand St Basement", "lvl": "$", "dishes": "Bulk Frozen Dumplings, Hot Wheat Noodles with Peanut Butter", "lo": 3, "hi": 6}, {"id": 36, "name": "Mei Lai Wah", "zh": "美梨華包點", "cat": "Bakeries & Steam Buns", "addr": "41 Mott St", "lvl": "$", "dishes": "Baked BBQ Pork Bun, Pineapple Pork Bun, Steamed Pork Bun", "lo": 2, "hi": 5}, {"id": 37, "name": "Golden Steamer (Mott St)", "zh": "金蒸包子店", "cat": "Bakeries & Steam Buns", "addr": "143A Mott St", "lvl": "$", "dishes": "Steamed Pork Buns, Pumpkin Custard Buns, Salted Egg Yolk Buns", "lo": 1, "hi": 4}, {"id": 38, "name": "Golden Steamer (Eldridge St)", "zh": "金蒸包子分店", "cat": "Bakeries & Steam Buns", "addr": "138 Eldridge St", "lvl": "$", "dishes": "Vegetable Steamed Buns, Sweet Red Bean Buns, Pork Bao", "lo": 1, "hi": 4}, {"id": 39, "name": "Double Crispy Bakery", "zh": "雙喜餅家", "cat": "Bakeries & Steam Buns", "addr": "230 Grand St", "lvl": "$", "dishes": "Egg Tarts, Curry Chicken Pastry, Pork Floss Bun", "lo": 2, "hi": 5}, {"id": 40, "name": "Fay Da Bakery (Mott St)", "zh": "輝達餅家", "cat": "Bakeries & Steam Buns", "addr": "83 Mott St", "lvl": "$", "dishes": "Hot Dog Rolls, Ham & Cheese Bun, Curry Chicken Pie", "lo": 2, "hi": 5}, {"id": 41, "name": "Fay Da Bakery (Centre St)", "zh": "輝達餅家分店", "cat": "Bakeries & Steam Buns", "addr": "191 Centre St", "lvl": "$", "dishes": "Taro Buns, Pineapple Roast Pork Buns, Coconut Cream Buns", "lo": 2, "hi": 5}, {"id": 42, "name": "Tai Pan Bakery", "zh": "大班餅店", "cat": "Bakeries & Steam Buns", "addr": "194 Canal St", "lvl": "$", "dishes": "Hong Kong Egg Tarts, Sesame Balls, BBQ Pork Pastry", "lo": 2, "hi": 6}, {"id": 43, "name": "Mee Sum Cafe", "zh": "美心茶室", "cat": "Bakeries & Steam Buns", "addr": "26 Pell St", "lvl": "$", "dishes": "Zongzi (Bamboo Wrapped Sticky Rice), Hot Pork Buns", "lo": 3, "hi": 7}, {"id": 44, "name": "Kam Hing Coffee Shop", "zh": "金興海綿蛋糕", "cat": "Bakeries & Steam Buns", "addr": "118 Baxter St", "lvl": "$", "dishes": "Fresh Sponge Cakes (Pandan, Ube, Chocolate), Hot Coffee", "lo": 2, "hi": 4}, {"id": 45, "name": "Chinatown Cake House", "zh": "唐人街蛋糕屋", "cat": "Bakeries & Steam Buns", "addr": "209 Grand St", "lvl": "$", "dishes": "Savory Pork Pastries, Custard Buns, Fresh Sponge Slices", "lo": 2, "hi": 5}, {"id": 46, "name": "Lung Moon Bakery", "zh": "龍門餅家", "cat": "Bakeries & Steam Buns", "addr": "83 Mulberry St", "lvl": "$", "dishes": "Roast Pork Pineapple Buns, Warm Mooncakes, Egg Tarts", "lo": 2, "hi": 5}, {"id": 47, "name": "New Dung House Bakery", "zh": "新東亞餅家", "cat": "Bakeries & Steam Buns", "addr": "41 Elizabeth St", "lvl": "$", "dishes": "Chicken Pies, Coconut Buns, Hot Sausage Rolls", "lo": 2, "hi": 5}, {"id": 48, "name": "Audrey Bakery & Cafe", "zh": "奧黛麗餅家", "cat": "Bakeries & Steam Buns", "addr": "12 Bowery", "lvl": "$", "dishes": "Hot Ham Pastries, Pork Floss Rolls, Hot Egg Tarts", "lo": 2, "hi": 6}, {"id": 49, "name": "Bake Culture", "zh": "烘焙達人", "cat": "Bakeries & Steam Buns", "addr": "48 Bowery", "lvl": "$", "dishes": "Savory Polo Buns, Cheese Stuffed Breads, Milk Egg Tarts", "lo": 3, "hi": 6}, {"id": 50, "name": "Grace Bakery", "zh": "恩典餅家", "cat": "Bakeries & Steam Buns", "addr": "135 Mott St", "lvl": "$", "dishes": "Curry Chicken Turnovers, Steamed Meat Buns, Sponge Cakes", "lo": 2, "hi": 5}, {"id": 51, "name": "Kiu Man Bakery", "zh": "僑民餅家", "cat": "Bakeries & Steam Buns", "addr": "8 Great Jones St Area", "lvl": "$", "dishes": "Baked Char Siu Buns, Sausage Pastries, Hot HK Milk Tea", "lo": 2, "hi": 5}, {"id": 52, "name": "Kamel Bakery", "zh": "嘉美餅店", "cat": "Bakeries & Steam Buns", "addr": "38 Division St", "lvl": "$", "dishes": "Steamed Pork Bao, Sweet Rice Cakes, Savory Egg Cakes", "lo": 2, "hi": 4}, {"id": 53, "name": "Lucky King Bakery", "zh": "幸運王餅家", "cat": "Bakeries & Steam Buns", "addr": "280 Grand St", "lvl": "$", "dishes": "Hot Baked Char Siu Buns, Egg Tarts, Taro Pastries", "lo": 2, "hi": 5}, {"id": 54, "name": "Go Believe Bakery", "zh": "高信餅店", "cat": "Bakeries & Steam Buns", "addr": "173 Hester St", "lvl": "$", "dishes": "Warm Sesame Balls, BBQ Pork Rolls, Scallion Buns", "lo": 2, "hi": 5}, {"id": 55, "name": "Deluxe Food Market", "zh": "德昌食品市場", "cat": "Supermarkets & Food Courts", "addr": "79 Elizabeth St", "lvl": "$", "dishes": "3-Item Hot Steam Rice Box, Braised Duck Legs, Salt & Pepper Ribs", "lo": 6, "hi": 11}, {"id": 56, "name": "Mott Street Eatery", "zh": "莫特街美食廣場", "cat": "Supermarkets & Food Courts", "addr": "98 Mott St", "lvl": "$$", "dishes": "Hainanese Chicken Rice, Stewed Beef Rice Plates, Soup Noodles", "lo": 9, "hi": 15}, {"id": 57, "name": "Hong Kong Supermarket Hot Counter", "zh": "香港超級市場熱食部", "cat": "Supermarkets & Food Courts", "addr": "157 Hester St", "lvl": "$", "dishes": "2-Item Hot Rice Combo, Steamed Dim Sum, Braised Tofu", "lo": 6, "hi": 10}, {"id": 58, "name": "New York Mart Hot Deli", "zh": "紐約超市熱食專櫃", "cat": "Supermarkets & Food Courts", "addr": "128 Mott St", "lvl": "$", "dishes": "Steam Table Rice Boxes, Roasted Duck Wings, Fried Noodles", "lo": 6, "hi": 10}, {"id": 59, "name": "Canal Street Market Food Hall", "zh": "運河街美食集市", "cat": "Supermarkets & Food Courts", "addr": "265 Canal St", "lvl": "$$", "dishes": "Bento Bowls, Japanese Curry, Ramen, Fresh Boba Snacks", "lo": 12, "hi": 18}, {"id": 60, "name": "Century Supermarket Hot Bar", "zh": "世紀超市熱食", "cat": "Supermarkets & Food Courts", "addr": "205 Grand St", "lvl": "$", "dishes": "Pork Stew over Rice, Steamed Fish Fillets, Turnip Cakes", "lo": 6, "hi": 10}, {"id": 61, "name": "2 Bridge Shopping Center Basement Arcades", "zh": "二橋商場地下街", "cat": "Supermarkets & Food Courts", "addr": "75 East Broadway", "lvl": "$", "dishes": "Fujianese Fish Ball Soup, Peanut Sauce Noodles, Pork Buns", "lo": 4, "hi": 8}, {"id": 62, "name": "Elizabeth Center Underground Food Stalls", "zh": "伊利沙白中心地下街", "cat": "Supermarkets & Food Courts", "addr": "13 Elizabeth St", "lvl": "$", "dishes": "Egg Waffles, Curry Fish Balls, Fried Chicken Cutlets", "lo": 5, "hi": 10}, {"id": 63, "name": "Dim Sum Sam", "zh": "點心森", "cat": "Dim Sum Express", "addr": "59 Clinton St", "lvl": "$$", "dishes": "Fast Steamed Shumai, Har Gow, Baked Char Siu Bao", "lo": 8, "hi": 14}, {"id": 64, "name": "Dim Sum Go Go Counter", "zh": "點心高高外賣", "cat": "Dim Sum Express", "addr": "5 East Broadway", "lvl": "$$", "dishes": "Dim Sum Sampler Boxes, Crystal Dumplings, Spring Rolls", "lo": 10, "hi": 16}, {"id": 65, "name": "House of Joy Front Express", "zh": "喜運來大酒樓外賣", "cat": "Dim Sum Express", "addr": "28 Pell St", "lvl": "$", "dishes": "Egg Tarts, Baked Pork Buns, Steamed Rice Rolls, Turnip Cake", "lo": 5, "hi": 10}, {"id": 66, "name": "Golden Unicorn Express Window", "zh": "金豐外賣檔", "cat": "Dim Sum Express", "addr": "18 East Broadway", "lvl": "$$", "dishes": "Hot Shumai Baskets, Steamed Meat Buns, Sticky Rice in Lotus Leaf", "lo": 8, "hi": 15}, {"id": 67, "name": "Ping's Seafood Express Counter", "zh": "海鮮城點心處", "cat": "Dim Sum Express", "addr": "22 Mott St", "lvl": "$$", "dishes": "Crispy Shrimp Balls, Steamed Pork Ribs, Char Siu Sou", "lo": 9, "hi": 16}, {"id": 68, "name": "Dim Sum Palace (Chinatown Branch)", "zh": "點心皇", "cat": "Dim Sum Express", "addr": "27 Division St", "lvl": "$$", "dishes": "All-Day Dim Sum Boxes, Pan-Fried Dumplings, Congee", "lo": 10, "hi": 18}, {"id": 69, "name": "Nom Wah Tea Parlor (Takeout Counter)", "zh": "南華茶室外賣", "cat": "Dim Sum Express", "addr": "13 Doyers St", "lvl": "$$", "dishes": "OG Roast Pork Buns, Egg Rolls, Pan-Fried Turnip Cake", "lo": 9, "hi": 16}, {"id": 70, "name": "Jing Fong (Chinatown Pickup Counter)", "zh": "金豐酒樓外賣專櫃", "cat": "Dim Sum Express", "addr": "202 Centre St", "lvl": "$$", "dishes": "Har Gow, Shumai, Sticky Rice Lotus Leaf, Sesame Balls", "lo": 8, "hi": 15}, {"id": 71, "name": "Bánh Mì Saigòn", "zh": "西貢麵包店", "cat": "Southeast Asian & Fusion", "addr": "198 Grand St", "lvl": "$", "dishes": "BBQ Pork Bánh Mì, Grilled Chicken Bánh Mì, Spring Rolls", "lo": 7, "hi": 11}, {"id": 72, "name": "Saigon Vietnamese Sandwich Deli", "zh": "西貢三文治店", "cat": "Southeast Asian & Fusion", "addr": "369 Broome St", "lvl": "$", "dishes": "Classic House Special Bánh Mì, Lemongrass Beef Sandwich", "lo": 8, "hi": 12}, {"id": 73, "name": "Taiwan Bear House", "zh": "台灣熊屋", "cat": "Southeast Asian & Fusion", "addr": "11 Pell St", "lvl": "$$", "dishes": "Taiwanese Pork Chop Bento, Lu Rou Fan (Braised Pork Rice)", "lo": 10, "hi": 15}, {"id": 74, "name": "Kopitiam", "zh": "南洋咖啡館", "cat": "Southeast Asian & Fusion", "addr": "151 East Broadway", "lvl": "$$", "dishes": "Nasi Lemak, Kaya Toast, Curry Puff, Pulut Inti", "lo": 8, "hi": 15}, {"id": 75, "name": "Noree Thai Bazaar Express", "zh": "泰市集快餐", "cat": "Southeast Asian & Fusion", "addr": "274 Grand St", "lvl": "$$", "dishes": "Pad Thai to Go, Som Tum, Grilled Pork Skewers over Rice", "lo": 10, "hi": 16}, {"id": 76, "name": "Bánh Mì Café", "zh": "越南麵包啡館", "cat": "Southeast Asian & Fusion", "addr": "46 Mulberry St", "lvl": "$", "dishes": "Crispy Pork Belly Bánh Mì, Iced Coffee, Fried Spring Rolls", "lo": 7, "hi": 11}, {"id": 77, "name": "Jochee Bánh Mì", "zh": "巧滋越南麵包", "cat": "Southeast Asian & Fusion", "addr": "96 Baxter St", "lvl": "$", "dishes": "Sardine Bánh Mì, Tofu Vegetarian Sandwich, Fresh Summer Rolls", "lo": 7, "hi": 11}, {"id": 78, "name": "Pho Bang Takeout Station", "zh": "河粉王外賣部", "cat": "Southeast Asian & Fusion", "addr": "157 Mott St", "lvl": "$$", "dishes": "Quick Pho Eye Round Beef, Pork Chop Rice, Summer Rolls", "lo": 10, "hi": 16}, {"id": 79, "name": "Fuzhou Anping Restaurant", "zh": "福州安平小吃", "cat": "Southeast Asian & Fusion", "addr": "45 Division St", "lvl": "$", "dishes": "Fuzhou Fish Ball Soup, Pork Wontons, Peanut Sauce Noodles", "lo": 4, "hi": 8}, {"id": 80, "name": "Yun Nan Flavour House", "zh": "雲南風味館", "cat": "Southeast Asian & Fusion", "addr": "77 Mulberry St", "lvl": "$$", "dishes": "Crossing the Bridge Rice Noodles, Hot Cold Noodles", "lo": 10, "hi": 15}, {"id": 81, "name": "Rong Hang Fast Food", "zh": "榮航小吃", "cat": "Southeast Asian & Fusion", "addr": "38 Eldridge St", "lvl": "$", "dishes": "Fuzhou Fried Rice, Stewed Pork Ribs over Rice, Fish Balls", "lo": 5, "hi": 9}, {"id": 82, "name": "Taiwanese Bento Window", "zh": "台灣便當專賣", "cat": "Southeast Asian & Fusion", "addr": "42 Eldridge St", "lvl": "$", "dishes": "Crispy Chicken Leg Bento, Taiwanese Sausage over Rice", "lo": 8, "hi": 12}, {"id": 83, "name": "Kong Sihk Tong", "zh": "港食堂", "cat": "HK Cafes & Street Snacks", "addr": "65 Bayard St", "lvl": "$$", "dishes": "Baked Pork Chop over Rice, HK French Toast, Beef Chow Fun", "lo": 11, "hi": 18}, {"id": 84, "name": "Chang Lai Fishballs Noodles", "zh": "昌萊魚蛋粉", "cat": "HK Cafes & Street Snacks", "addr": "55 Bayard St", "lvl": "$", "dishes": "Street Style Curry Fish Balls, Pig Intestines, Rice Roll Combo", "lo": 4, "hi": 9}, {"id": 85, "name": "Joy's Cafe", "zh": "喜樂茶餐廳", "cat": "HK Cafes & Street Snacks", "addr": "60 Bayard St", "lvl": "$$", "dishes": "Spam & Egg Sandwich, Macau Style Baked Chicken Rice", "lo": 10, "hi": 16}, {"id": 86, "name": "MTC Cafe", "zh": "名茶餐廳", "cat": "HK Cafes & Street Snacks", "addr": "81 East Broadway", "lvl": "$", "dishes": "HK Milk Tea, Egg Sandwich, Beef Stew Rice Box", "lo": 6, "hi": 12}, {"id": 87, "name": "Star Cafe", "zh": "星島茶餐廳", "cat": "HK Cafes & Street Snacks", "addr": "19 Division St", "lvl": "$", "dishes": "Hot Coffee Mix Tea (Yuenyeung), Salted Fish Fried Rice", "lo": 7, "hi": 13}, {"id": 88, "name": "Chinatown Diner Box", "zh": "唐人快餐盒", "cat": "HK Cafes & Street Snacks", "addr": "104 Mott St", "lvl": "$", "dishes": "Curry Beef Brisket over Rice, HK Style Macaroni Soup", "lo": 8, "hi": 14}, {"id": 89, "name": "Wong's Fast Food Counter", "zh": "王氏快餐檔", "cat": "HK Cafes & Street Snacks", "addr": "50 Mott St", "lvl": "$", "dishes": "Fried Chicken Leg over Rice, Egg & Beef Toast", "lo": 7, "hi": 12}, {"id": 90, "name": "Grand Street Charcoal Skewer Cart", "zh": "生炭燒烤車", "cat": "Street Carts & Kiosks", "addr": "Grand St & Chrystie St", "lvl": "$", "dishes": "Charcoal Lamb Skewers, Beef Skewers, Grilled Chicken Wings", "lo": 2, "hi": 5}, {"id": 91, "name": "Rutgers & Eldridge Cheong Fun Cart", "zh": "路特格斯腸粉車", "cat": "Street Carts & Kiosks", "addr": "Eldridge St & Rutgers St", "lvl": "$", "dishes": "Steamed Rice Noodles with Peanut & Sweet Soy Sauce, Fishballs", "lo": 3, "hi": 6}, {"id": 92, "name": "Hester Street Rice Roll Cart", "zh": "海斯特街腸粉車", "cat": "Street Carts & Kiosks", "addr": "Hester St & Elizabeth St", "lvl": "$", "dishes": "Hot Fresh Steamed Rice Rolls, Chili Sauce Topping", "lo": 3, "hi": 5}, {"id": 93, "name": "Grand Street Station Zongzi Vendors", "zh": "粽子街頭小攤", "cat": "Street Carts & Kiosks", "addr": "Grand St Subway Station Steps", "lvl": "$", "dishes": "Warm Bamboo Wrapped Pork Sticky Rice, Sweet Bean Zongzi", "lo": 3, "hi": 5}, {"id": 94, "name": "Mosco Street Egg Cake Cart", "zh": "摩斯哥街雞蛋仔車", "cat": "Street Carts & Kiosks", "addr": "Mosco St & Mott St", "lvl": "$", "dishes": "Fresh Hot Mini Egg Waffles (Gai Daan Jai)", "lo": 3, "hi": 5}, {"id": 95, "name": "Canal & Mott Sponge Cake Cart", "zh": "運河街蛋糕小車", "cat": "Street Carts & Kiosks", "addr": "Canal St & Mott St", "lvl": "$", "dishes": "Hot Baked Mini Cakes, Sesame Waffles", "lo": 3, "hi": 5}, {"id": 96, "name": "Mulberry Roasted Chestnut & Corn Cart", "zh": "桑樹街炒栗子車", "cat": "Street Carts & Kiosks", "addr": "Mulberry St & Canal St", "lvl": "$", "dishes": "Charcoal Roasted Chestnuts, Hot Steamed Sweet Corn", "lo": 4, "hi": 7}, {"id": 97, "name": "Bayard Street Nian Gao Pushcart", "zh": "巴查街年糕攤", "cat": "Street Carts & Kiosks", "addr": "Bayard St & Mott St", "lvl": "$", "dishes": "Warm Fried Rice Cakes (Nian Gao), Pan-Fried Radish Cake", "lo": 3, "hi": 6}, {"id": 98, "name": "Division Street BBQ Skewer Pushcart", "zh": "地威臣街燒烤車", "cat": "Street Carts & Kiosks", "addr": "Division St under Manhattan Bridge", "lvl": "$", "dishes": "Cumin Lamb Skewers, Spicy Squid Skewers, Pork Rib Kebab", "lo": 2, "hi": 5}, {"id": 99, "name": "Chrystie Street Sweet Potato Cart", "zh": "克里斯蒂街烤紅薯攤", "cat": "Street Carts & Kiosks", "addr": "Chrystie St & Grand St", "lvl": "$", "dishes": "Whole Roasted Sweet Potatoes, Roasted Yam", "lo": 3, "hi": 5}, {"id": 100, "name": "Pell Street Dim Sum Cart", "zh": "沛爾街點心小車", "cat": "Street Carts & Kiosks", "addr": "Pell St & Mulberry St", "lvl": "$", "dishes": "Steamed Pork Buns, Steamed Pork Ribs, Curry Fishballs", "lo": 3, "hi": 6}];
+
+/* ---------- Place addresses on the schematic map ----------
+   Each street maps house numbers to a position along it (approximate anchors). */
+const V = { // north–south streets: x fixed, [number, y]
+  "mott st":{x:420, pts:[[1,665],[20,565],[30,510],[55,430],[85,330],[130,220],[165,110],[200,10],[240,-80]]},
+  "mulberry st":{x:320, pts:[[1,640],[45,500],[65,430],[100,330],[150,220],[190,110],[225,10],[260,-80]]},
+  "elizabeth st":{x:510, pts:[[1,425],[55,330],[110,220],[160,110],[200,10],[240,-80]]},
+  "bowery":{x:600, pts:[[1,650],[20,520],[28,445],[70,330],[100,220],[130,110],[160,10],[190,-80]], flip:true},
+  "centre st":{x:120, pts:[[150,330],[180,220],[200,110],[225,10],[250,-80]]},
+  "baxter st":{x:220, pts:[[60,610],[80,430],[105,330],[140,220],[170,110],[190,10]]},
+  "chrystie st":{x:700, pts:[[1,330],[45,220],[85,110],[125,10],[165,-80]]},
+  "forsyth st":{x:770, pts:[[1,442],[40,330],[70,220],[105,110],[140,10],[175,-80]]},
+  "eldridge st":{x:840, pts:[[1,452],[30,330],[60,220],[100,110],[140,10],[220,-78]]},
+  "allen st":{x:910, pts:[[1,461],[30,330],[55,220],[75,110],[110,10],[150,-80]]},
+  "orchard st":{x:980, pts:[[1,330],[45,220],[85,110],[125,10]]},
+  "essex st":{x:1050, pts:[[1,330],[45,220],[85,110],[125,10]]},
+};
+const H = { // east–west streets: y fixed, [number, x]
+  "bayard st":{y:430, pts:[[35,600],[55,510],[75,420],[90,320],[110,220]]},
+  "pell st":{y:510, pts:[[1,600],[35,420]]},
+  "mosco st":{y:560, pts:[[1,420],[200,320]]},
+  "canal st":{y:330, pts:[[165,600],[175,510],[188,420],[200,320],[225,220],[245,120],[270,50]]},
+  "grand st":{y:110, pts:[[150,120],[175,220],[190,320],[202,420],[212,510],[225,600],[245,700],[265,770],[285,840],[300,910],[320,980],[340,1050]]},
+  "hester st":{y:220, pts:[[85,980],[100,840],[120,700],[135,600],[150,510],[165,420],[180,320],[195,220],[210,120]]},
+  "broome st":{y:10, pts:[[100,1050],[150,840],[250,600],[370,420],[400,320],[440,120]]},
+};
+const D = { // diagonal streets: from point A to B, number → share of length
+  "east broadway":{a:[600,655], b:[1110,534], k:180},
+  "division st":{a:[600,420], b:[1110,487], k:210},
+};
+const SPECIAL = { // addresses the street model can't place on its own
+  "Eldridge St & Rutgers St":[840,456], "Pell St & Mulberry St":[400,520],
+  "Division St under Manhattan Bridge":[660,436], "Grand St Subway Station Steps":[700,98],
+  "8 Chatham Sq":[570,682], "22 Chatham Sq":[622,675],
+  "118 Henry St":[1095,620], "59 Clinton St":[1100,-70],
+};
+const OFFMAP = ["8 Great Jones St Area"];
+
+function interp(pts, n){
+  if (n <= pts[0][0]) return pts[0][1];
+  for (let i=1;i<pts.length;i++){ const [n1,v1]=pts[i-1],[n2,v2]=pts[i]; if (n <= n2) return v1 + (v2-v1)*(n-n1)/(n2-n1); }
+  return pts[pts.length-1][1];
+}
+function streetPoint(name, n){
+  name = name.toLowerCase().replace(/\s+/g," ").trim();
+  if (V[name]){ const s=V[name]; const side=(n%2? -1:1)*(s.flip?-1:1); return [s.x + side*11, interp(s.pts,n)]; }
+  if (H[name]){ const s=H[name]; const side=n%2? -1:1; return [interp(H[name].pts,n), s.y + side*11]; }
+  if (D[name]){ const s=D[name]; const t=Math.min(.97, Math.max(.03, n/s.k)); return [s.a[0]+(s.b[0]-s.a[0])*t, s.a[1]+(s.b[1]-s.a[1])*t + (n%2?-11:11)]; }
+  if (name==="doyers st"){ const t=Math.min(.95,Math.max(.05,1-n/30)); const P=[[470,510],[480,562],[540,562],[600,600]]; const u=1-t;
+    return [u*u*u*P[0][0]+3*u*u*t*P[1][0]+3*u*t*t*P[2][0]+t*t*t*P[3][0], u*u*u*P[0][1]+3*u*u*t*P[1][1]+3*u*t*t*P[2][1]+t*t*t*P[3][1]]; }
+  return null;
+}
+function locate(addr){
+  if (SPECIAL[addr]) return SPECIAL[addr];
+  if (OFFMAP.includes(addr)) return null;
+  const inter = addr.split(" & ");
+  if (inter.length===2){
+    const a=inter[0].toLowerCase(), b=inter[1].toLowerCase();
+    const v = V[a]?a:V[b]?b:null, h = H[a]?a:H[b]?b:null;
+    if (v && h) return [V[v].x + 9, H[h].y - 9];
+  }
+  const m = addr.match(/^(\d+)[A-Z]?\s+(.+?)(\s+(Stall.*|Basement|Area))?$/);
+  if (m) return streetPoint(m[2], +m[1]);
+  return null;
+}
+SHOPS.forEach(s => { const p = locate(s.addr); s.x = p ? p[0] : null; s.y = p ? p[1] : null; });
+/* nudge overlapping dots apart */
+(function relax(){
+  const pts = SHOPS.filter(s=>s.x!==null);
+  for (let it=0; it<80; it++){
+    for (let i=0;i<pts.length;i++) for (let j=i+1;j<pts.length;j++){
+      const a=pts[i], b=pts[j]; let dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy);
+      if (d < 17){ if (d===0){dx=1;dy=0.5;d=1.1;} const push=(17-d)/2; a.x-=dx/d*push; a.y-=dy/d*push; b.x+=dx/d*push; b.y+=dy/d*push; }
+    }
+  }
+})();
+
+/* ---------- Dietary flags, read from the "Popular Dishes" text ----------
+   Edit these word lists, or add real columns to your sheet, to improve accuracy. */
+const VEG_WORDS = ["vegan","vegetarian","vegetable","tofu","douhua","red bean","sweet potato","yam","chestnut","corn",
+  "sesame ball","egg waffle","sponge cake","taro","coconut","custard","pumpkin","nian gao","sesame waffle","mini cakes","kaya toast"];
+const ALLERGENS = [
+  {id:"peanut", label:"Peanuts", words:["peanut"]},
+  {id:"shellfish", label:"Shellfish", words:["shrimp","crab","squid","snail","seafood","lobster"]},
+  {id:"fish", label:"Fish", words:["fish","sardine"]},
+  {id:"egg", label:"Eggs", words:["egg","custard","french toast","sponge cake","mooncake"]},
+  {id:"sesame", label:"Sesame", words:["sesame"]},
+  {id:"dairy", label:"Dairy", words:["milk","cheese","cream"]},
+];
+SHOPS.forEach(s => {
+  const dishes = s.dishes.split(/,\s*(?![^(]*\))/);
+  s.vegDish = dishes.find(d => VEG_WORDS.some(w => d.toLowerCase().includes(w))) || null;
+  const t = s.dishes.toLowerCase();
+  s.allergens = ALLERGENS.filter(a => a.words.some(w => t.includes(w))).map(a=>a.id);});
+
+/* ---------- Subway ---------- */
+const STATIONS = [
+  {name:"Canal St", lines:["J","Z","N","Q","R","W","6"], x:110, y:330},
+  {name:"Grand St", lines:["B","D"], x:700, y:110},
+  {name:"East Broadway", lines:["F"], x:1010, y:550},
+  {name:"Bowery", lines:["J","Z"], x:600, y:-75},
+  {name:"Delancey St–Essex St", lines:["F","J","M","Z"], x:1050, y:-75},
+  {name:"Chambers St / Brooklyn Bridge", lines:["J","Z","4","5","6"], x:150, y:765},
+];
+const LINE_COLORS = {"4":"#00933C","5":"#00933C","6":"#00933C","J":"#996633","Z":"#996633","N":"#FCCC0A","Q":"#FCCC0A","R":"#FCCC0A","W":"#FCCC0A","B":"#FF6319","D":"#FF6319","F":"#FF6319","M":"#FF6319"};
+const nearest = s => s.x===null ? null : STATIONS.reduce((b,st)=>{ const d=Math.hypot(st.x-s.x, st.y-s.y); return d<b.d?{st,d}:b; },{st:null,d:1e9}).st;
+
+/* ---------- UI ---------- */
+const $ = q => document.querySelector(q);
+const NS = "http://www.w3.org/2000/svg";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const byId = id => SHOPS.find(s=>s.id===id);
+let budget = 10, cat = "all", selected = null, dest = 3, vegOnly = false;
+const skip = new Set();
+const passes = s => (cat==="all" || s.cat===cat) && (!vegOnly || s.vegDish) && !s.allergens.some(a=>skip.has(a));
+$("#allergens").innerHTML = ALLERGENS.map(a=>`<input type="checkbox" id="al-${a.id}" value="${a.id}"><label for="al-${a.id}">${a.label}</label>`).join("");
+
+const status = s => s.hi <= budget ? "full" : s.lo <= budget ? "part" : "none";
+const orders = s => Math.max(1, Math.floor(budget / ((s.lo + Math.min(s.hi, budget)) / 2)));
+
+const cats = [...new Set(SHOPS.map(s=>s.cat))];
+$("#cat").innerHTML = `<option value="all">All kinds of food (${SHOPS.length})</option>` +
+  cats.map(c=>`<option value="${esc(c)}">${esc(c)} (${SHOPS.filter(s=>s.cat===c).length})</option>`).join("");
+
+const dotsG = $("#dots");
+SHOPS.filter(s=>s.x!==null).forEach(s => {
+  const g = document.createElementNS(NS,"g");
+  g.setAttribute("class","dot"); g.setAttribute("tabindex","0"); g.setAttribute("role","button");
+  g.dataset.id = s.id;
+  g.innerHTML = `<circle class="halo" cx="${s.x.toFixed(1)}" cy="${s.y.toFixed(1)}" r="17"/>
+    <circle class="dest" cx="${s.x.toFixed(1)}" cy="${s.y.toFixed(1)}" r="13"/>
+    <g class="pop"><circle class="core" cx="${s.x.toFixed(1)}" cy="${s.y.toFixed(1)}" r="7"/></g>`;
+  g.addEventListener("mouseenter",()=>showTag(s));
+  g.addEventListener("mouseleave",()=>showTag(selected ? byId(selected) : null));
+  g.addEventListener("focus",()=>showTag(s));
+  g.addEventListener("blur",()=>showTag(selected ? byId(selected) : null));
+  g.addEventListener("click",()=>select(s.id,true));
+  g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();select(s.id,true);} });
+  dotsG.appendChild(g);
+});
+
+function showTag(s){
+  const tag = $("#tag");
+  if(!s || s.x===null){ tag.setAttribute("visibility","hidden"); return; }
+  const t = tag.querySelector("text"), r = tag.querySelector("rect");
+  t.textContent = `${s.name} · $${s.lo}–${s.hi}`;
+  const w = t.getComputedTextLength() + 20;
+  let x = s.x + 14; if (x + w > 1110) x = s.x - 14 - w;
+  tag.setAttribute("transform",`translate(${x},${s.y-13})`);
+  r.setAttribute("width", w); t.setAttribute("x", 10);
+  tag.setAttribute("visibility","visible");
+}
+
+function select(id, fromMap){
+  selected = selected === id && fromMap ? null : id;
+  if (selected) setDest(selected);
+  document.querySelectorAll(".dot").forEach(d=>d.classList.toggle("sel", +d.dataset.id===selected));
+  document.querySelectorAll("[data-card]").forEach(r=>r.classList.toggle("sel", +r.dataset.card===selected));
+  showTag(selected ? byId(selected) : null);
+  if (fromMap && selected){
+    const el = document.querySelector(`[data-card="${selected}"]`);
+    if (el) el.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto":"smooth", block:"nearest"});
+  }
+}
+
+function rangeBar(s){
+  const X = v => 4 + v/30*192;
+  return `<svg class="range" viewBox="0 0 200 18" preserveAspectRatio="none" aria-hidden="true">
+    <rect class="trk" x="4" y="6" width="192" height="6" rx="3"/>
+    <rect class="fill" x="${X(s.lo)}" y="6" width="${Math.max(3, X(s.hi)-X(s.lo))}" height="6" rx="3"/>
+    <line class="bud" x1="${X(budget)}" x2="${X(budget)}" y1="1" y2="17"/></svg>`;
+}
+
+function render(){
+  $("#amt").textContent = "$" + budget;
+  const pool = SHOPS.filter(passes);
+  const fits = pool.filter(s=>status(s)!=="none")
+    .sort((a,b)=> (status(a)==="full"?0:1)-(status(b)==="full"?0:1) || orders(b)-orders(a) || a.lo-b.lo || a.name.localeCompare(b.name));
+  const over = pool.filter(s=>status(s)==="none").sort((a,b)=>a.lo-b.lo);
+
+  $("#count").textContent = fits.length;
+  $("#shown").textContent = pool.length;
+  const nFull = fits.filter(s=>status(s)==="full").length;
+  $("#ticks").innerHTML = pool.map((_,i)=> `<i class="${i<nFull?"full":i<fits.length?"part":""}"></i>`).join("");
+
+  document.querySelectorAll(".dot").forEach(d=>{
+    const s = byId(+d.dataset.id), st = status(s), inCat = passes(s);
+    d.classList.remove("full","part","none","hide");
+    d.classList.add(inCat ? st : "hide");
+    d.setAttribute("aria-label", `${s.name}, ${s.addr}, typical spend $${s.lo} to $${s.hi}`);
+  });
+
+  $("#cards").innerHTML = fits.map(s => {
+    const st = status(s), n = orders(s);
+    return `<article class="card${s.id===selected?" sel":""}" data-card="${s.id}" tabindex="0">
+      <div class="c-head"><span class="c-name">${esc(s.name)}<span class="c-zh" lang="zh-Hant">${esc(s.zh)}</span></span>
+        <span class="pill ${st}">${st==="full"?"Whole menu":"Cheaper items"}</span></div>
+      <div class="c-meta">${esc(s.cat)} · ${esc(s.addr)}${s.x===null?" · off this map":""}</div>
+      <div class="c-dishes">${esc(s.dishes)}</div>
+      ${(s.vegDish || s.allergens.length) ? `<div class="tags">${s.vegDish?`<span class="tag-veg">Meat-free: ${esc(s.vegDish)}</span>`:""}${s.allergens.length?`<span class="tag-al">Dishes include: ${s.allergens.map(a=>ALLERGENS.find(x=>x.id===a).label.toLowerCase()).join(", ")}</span>`:""}</div>` : ""}
+      ${rangeBar(s)}
+      <div class="c-row"><span class="c-price">Typical $${s.lo}–${s.hi} · <b>$${budget} ≈ ${n} ${n===1?"order":"orders"}</b></span>
+        <button class="linkbtn" type="button" data-go="${s.id}">Directions →</button></div>
+    </article>`;
+  }).join("");
+
+  $("#over").innerHTML = over.length ? `<span class="label">Over budget at $${budget} (${over.length})</span>
+    <p>${over.map(s=>`${esc(s.name)} <span style="opacity:.7">from $${s.lo}</span>`).join(" · ")}</p>` : "";
+
+  document.querySelectorAll("[data-card]").forEach(r=>{
+    r.addEventListener("click",()=>select(+r.dataset.card,false));
+    r.addEventListener("keydown",e=>{ if(e.key==="Enter" && e.target===r) select(+r.dataset.card,false); });
+  });
+  document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",e=>{
+    e.stopPropagation(); select(+b.dataset.go,false);
+    const f=$("#from"); f.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto":"smooth", block:"center"}); f.focus({preventScroll:true});
+  }));
+}
+
+/* Directions */
+const toSel = $("#to");
+toSel.innerHTML = cats.map(c=>`<optgroup label="${esc(c)}">` +
+  SHOPS.filter(s=>s.cat===c).sort((a,b)=>a.name.localeCompare(b.name)).map(s=>`<option value="${s.id}">${esc(s.name)} · ${esc(s.addr)}</option>`).join("") + "</optgroup>").join("");
+function setDest(id){ dest = id; toSel.value = String(id); updateGo(); }
+function updateGo(){
+  const s = byId(dest), st = nearest(s);
+  const mode = document.querySelector('input[name="m"]:checked').value;
+  const origin = $("#from").value.trim();
+  const p = new URLSearchParams({api:"1", destination:`${s.name}, ${s.addr.replace(/ Area$/,"")}, New York, NY`, travelmode:mode});
+  if (origin) p.set("origin", origin);
+  $("#goBtn").href = "https://www.google.com/maps/dir/?" + p.toString();
+  $("#subway").innerHTML = st ? `<span class="hint">Nearest subway (approx.):</span> <b>${st.name}</b> ` +
+    st.lines.map(l=>`<span class="bullet" style="background:${LINE_COLORS[l]};${["N","Q","R","W"].includes(l)?"color:#111":""}">${l}</span>`).join("")
+    : `<span class="hint">This spot is outside the map area.</span>`;
+  document.querySelectorAll(".dot").forEach(d=>d.classList.toggle("isdest", +d.dataset.id===dest));
+}
+toSel.addEventListener("change",()=>{ dest = +toSel.value; updateGo(); });
+$("#from").addEventListener("input", updateGo);
+document.querySelectorAll('input[name="m"]').forEach(i=>i.addEventListener("change",updateGo));
+$("#from").addEventListener("keydown",e=>{ if(e.key==="Enter") $("#goBtn").click(); });
+$("#cat").addEventListener("change",e=>{ cat = e.target.value; render(); });
+$("#veg").addEventListener("change",e=>{ vegOnly = e.target.checked; render(); });
+document.querySelectorAll("#allergens input").forEach(i=>i.addEventListener("change",()=>{ i.checked ? skip.add(i.value) : skip.delete(i.value); render(); }));
+document.querySelectorAll('input[name="b"]').forEach(i=>i.addEventListener("change",()=>{ budget = +i.value; render(); }));
+render();
+setDest(dest);
+</script>
+
+</body></html>
