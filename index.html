@@ -66,6 +66,31 @@
     .stage { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; padding: 24px 0; }
     .stage[hidden] { display: none; }
     .stage h1 { margin: 0; font-size: clamp(32px, 5vw, 56px); font-weight: 700; line-height: 1; letter-spacing: 0.04em; }
+    /* Title with circled part numbers (1, 2, ...) */
+    .title-row { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+    .parts { display: flex; gap: 10px; }
+    .part {
+      all: unset;
+      box-sizing: border-box;
+      width: 40px; height: 40px;
+      border: 2px solid var(--red);
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 18px; font-weight: 700;
+      cursor: pointer;
+    }
+    .part:hover { background: rgba(232, 57, 43, 0.12); }
+    .part[aria-pressed="true"] { background: var(--red); color: var(--paper); }
+    .part:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+    .part-view { width: 100%; flex: 1; display: flex; flex-direction: column; }
+    .part-view[hidden] { display: none; }
+    .placeholder {
+      flex: 1; min-height: 60vh;
+      display: grid; place-items: center;
+      border: 1.5px dashed var(--red);
+      font-size: 14px; font-weight: 500;
+    }
+
     .stage iframe {
       width: 100%;
       flex: 1;
@@ -170,8 +195,23 @@
 
       <!-- Chinatown: shown in the center when picked from the Projects menu -->
       <main class="stage" id="chinatown" hidden>
-        <h1>Chinatown</h1>
-        <iframe data-src="chinatown-map.html" title="Chinatown NYC 3D map" allow="fullscreen"></iframe>
+        <div class="title-row">
+          <h1>Chinatown</h1>
+          <div class="parts" role="group" aria-label="Chinatown projects">
+            <button type="button" class="part" data-part="chinatown-1" aria-pressed="true" aria-label="Chinatown project 1">1</button>
+            <button type="button" class="part" data-part="chinatown-2" aria-pressed="false" aria-label="Chinatown project 2">2</button>
+          </div>
+        </div>
+
+        <!-- Chinatown 1: 3D map -->
+        <div class="part-view" id="chinatown-1">
+          <iframe data-src="chinatown-map.html" title="Chinatown NYC 3D map" allow="fullscreen"></iframe>
+        </div>
+
+        <!-- Chinatown 2: replace the placeholder with the second project -->
+        <div class="part-view" id="chinatown-2" hidden>
+          <div class="placeholder">Chinatown 2 — coming soon</div>
+        </div>
       </main>
 
       <div class="bottom" id="contact">
@@ -202,6 +242,13 @@
     document.addEventListener('click', function (e) {
       if (!menu.contains(e.target)) setOpen(false);
     });
+    // Load embedded projects only when they're first shown.
+    function loadFrames(el) {
+      el.querySelectorAll('.part-view:not([hidden]) iframe[data-src]').forEach(function (f) {
+        if (!f.src) f.src = f.dataset.src;
+      });
+    }
+
     // Picking a project shows it in the center of the page.
     document.querySelectorAll('[data-project]').forEach(function (link) {
       link.addEventListener('click', function (e) {
@@ -209,11 +256,21 @@
         document.querySelectorAll('.stage').forEach(function (s) { s.hidden = true; });
         var stage = document.getElementById(link.dataset.project);
         stage.hidden = false;
-        // Load the embedded project only when it's first opened.
-        stage.querySelectorAll('iframe[data-src]').forEach(function (f) {
-          if (!f.src) f.src = f.dataset.src;
-        });
+        loadFrames(stage);
         setOpen(false);
+      });
+    });
+
+    // Circled numbers next to a project title switch between its parts.
+    document.querySelectorAll('.part').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var stage = b.closest('.stage');
+        stage.querySelectorAll('.part').forEach(function (o) {
+          var on = o === b;
+          o.setAttribute('aria-pressed', on);
+          document.getElementById(o.dataset.part).hidden = !on;
+        });
+        loadFrames(stage);
       });
     });
 
