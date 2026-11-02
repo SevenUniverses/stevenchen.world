@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --frame: #f39a3a;   /* orange border */
+      --paper: #ebdcc3;   /* cream background */
+      --red: #e8392b;     /* red text and shapes */
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--frame);
+      padding: 14px;
+      color: var(--red);
+      font-family: "Oswald", "Arial Narrow", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    a { color: inherit; text-decoration: none; }
+    .page { background: var(--paper); }
+
+    /* ---------- Front page ---------- */
+    .hero {
+      position: relative;
+      min-height: calc(100vh - 28px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 28px 32px 0;
+      overflow: hidden;
+    }
+    .small { font-size: 11px; line-height: 1.4; font-weight: 500; }
+
+    .top {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: start;
+      gap: 16px;
+    }
+    .top nav { display: flex; gap: 48px; font-size: 13px; font-weight: 500; }
+    .top nav a:hover, .lang a:hover { text-decoration: underline; }
+    .lang { justify-self: end; font-size: 11px; font-weight: 500; }
+
+    /* Projects drop-down: a horizontal row under the top bar */
+    .top nav button { all: unset; cursor: pointer; }
+    .top nav button:hover, .top nav button[aria-expanded="true"] { text-decoration: underline; }
+    .dropdown {
+      display: none;
+      margin: 20px -32px 0;
+      border-top: 1.5px solid var(--red);
+      border-bottom: 1.5px solid var(--red);
+    }
+    .dropdown.open { display: flex; flex-wrap: wrap; justify-content: center; }
+    .dropdown a { padding: 14px 28px; font-size: 13px; font-weight: 500; }
+    .dropdown a:hover { background: var(--red); color: var(--paper); }
+
+    /* Center area where a chosen project is shown */
+    .stage { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; padding: 24px 0; }
+    .stage[hidden] { display: none; }
+    .stage h1 { margin: 0; font-size: clamp(32px, 5vw, 56px); font-weight: 700; line-height: 1; letter-spacing: 0.04em; }
+    .stage iframe {
+      width: 100%;
+      flex: 1;
+      min-height: 60vh;
+      border: 1.5px solid var(--red);
+      background: #c3e7f8;
+    }
+
+    .emblem {
+      width: min(520px, 86vw);
+      margin: 32px auto;
+      display: block;
+    }
+
+    .bottom {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: end;
+      padding-bottom: 24px;
+    }
+    .icons { justify-self: end; display: flex; gap: 12px; }
+    .icons a {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--red);
+      color: var(--paper);
+      display: grid; place-items: center;
+      font-size: 10px; font-weight: 700;
+    }
+
+    .triangle {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 110px solid transparent;
+      border-right: 110px solid transparent;
+      border-bottom: 90px solid var(--red);
+    }
+    .triangle a {
+      position: absolute;
+      left: -60px; width: 120px;
+      top: 48px;
+      text-align: center;
+      color: var(--paper);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* ---------- Projects ---------- */
+    .projects { padding: 72px 32px 96px; max-width: 900px; margin: 0 auto; }
+    .projects h2 { font-size: 13px; font-weight: 500; margin: 0 0 32px; text-align: center; }
+    .projects ul { list-style: none; margin: 0; padding: 0; }
+    .projects li { border-top: 1.5px solid var(--red); }
+    .projects li:last-child { border-bottom: 1.5px solid var(--red); }
+    .projects li a {
+      display: flex; justify-content: space-between; gap: 16px;
+      padding: 18px 0;
+      font-size: 22px; font-weight: 500;
+    }
+    .projects li a:hover { background: var(--red); color: var(--paper); padding-inline: 12px; }
+    .projects .meta { font-size: 13px; align-self: center; white-space: nowrap; }
+
+    /* ---------- Phone ---------- */
+    @media (max-width: 640px) {
+      body { padding: 8px; }
+      .hero { min-height: calc(100vh - 16px); padding: 20px 16px 0; }
+      .top { grid-template-columns: 1fr auto; }
+      .top nav { grid-column: 1 / -1; grid-row: 2; justify-content: center; gap: 24px; margin-top: 12px; }
+      .bottom { grid-template-columns: 1fr 1fr; }
+      .bottom > :nth-child(2) { display: none; }
+      .dropdown { margin: 16px -16px 0; }
+      .dropdown a { padding: 12px 14px; }
+      .projects { padding: 56px 16px 72px; }
+      .projects li a { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <header>
+      <div class="top">
+        <div></div>
+        <nav>
+          <button type="button" id="projects-btn" aria-expanded="false" aria-controls="projects-menu">Projects</button>
+          <a href="#contact">About</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <div class="lang">EN</div>
+      </div>
+
+      <div class="dropdown" id="projects-menu">
+        <a href="#chinatown" data-project="chinatown">Chinatown</a>
+        <a href="#">Project Two</a>
+        <a href="#">Project Three</a>
+        <a href="#">Project Four</a>
+        <a href="#">Project Five</a>
+      </div>
+      </header>
+
+      <!-- Chinatown: shown in the center when picked from the Projects menu -->
+      <main class="stage" id="chinatown" hidden>
+        <h1>Chinatown</h1>
+        <iframe data-src="chinatown-map.html" title="Chinatown NYC 3D map" allow="fullscreen"></iframe>
+      </main>
+
+      <div class="bottom" id="contact">
+        <div class="small">New York<br>School of Visual Arts<br>schen146@sva.edu</div>
+        <div></div>
+        <div class="icons">
+          <a href="mailto:schen146@sva.edu" aria-label="Email">@</a>
+          <a href="#" aria-label="Instagram">IG</a>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <script>
+    // Projects drop-down: click to open/close; click elsewhere or press Esc to close.
+    var btn = document.getElementById('projects-btn');
+    var menu = document.getElementById('projects-menu');
+    function setOpen(open) {
+      menu.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open);
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(!menu.classList.contains('open'));
+    });
+    document.addEventListener('click', function (e) {
+      if (!menu.contains(e.target)) setOpen(false);
+    });
+    // Picking a project shows it in the center of the page.
+    document.querySelectorAll('[data-project]').forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelectorAll('.stage').forEach(function (s) { s.hidden = true; });
+        var stage = document.getElementById(link.dataset.project);
+        stage.hidden = false;
+        // Load the embedded project only when it's first opened.
+        stage.querySelectorAll('iframe[data-src]').forEach(function (f) {
+          if (!f.src) f.src = f.dataset.src;
+        });
+        setOpen(false);
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  </script>
+</body>
+</html>
