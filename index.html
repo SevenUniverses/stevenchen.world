@@ -85,7 +85,7 @@
       line-height: 1.5;
     }
     .credit a { text-decoration: underline; text-underline-offset: 2px; }
-    /* Little message that pops up and fades (Contact) */
+    /* Little message that pops up and fades (About) */
     .toast {
       position: fixed;
       left: 50%;
@@ -227,8 +227,7 @@
         </a>
         <nav>
           <button type="button" id="projects-btn" aria-expanded="false" aria-controls="projects-menu">Projects</button>
-          <a href="#contact">About</a>
-          <button type="button" id="contact-btn">Contact</button>
+          <button type="button" id="about-btn">About</button>
         </nav>
         <div class="lang">EN</div>
       </div>
@@ -349,7 +348,7 @@
       setOpen(false);
     });
 
-    // Contact: show a short message that fades out after a few seconds.
+    // About: show a short message that fades out after a few seconds.
     var toast = document.getElementById('toast');
     var toastTimer;
     function showToast(text) {
@@ -358,7 +357,7 @@
       clearTimeout(toastTimer);
       toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 3000);
     }
-    document.getElementById('contact-btn').addEventListener('click', function () {
+    document.getElementById('about-btn').addEventListener('click', function () {
       setOpen(false);
       showToast('Nothing here either \u{1F642}');
     });
