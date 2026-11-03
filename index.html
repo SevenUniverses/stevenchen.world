@@ -6,7 +6,7 @@
   <title>Steven.C</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --frame: #f39a3a;   /* orange border */
@@ -20,7 +20,7 @@
       background: var(--frame);
       padding: 14px;
       color: var(--red);
-      font-family: "Oswald", "Arial Narrow", sans-serif;
+      font-family: "Oswald", "Noto Sans TC", "Arial Narrow", sans-serif;
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
@@ -46,8 +46,16 @@
       gap: 16px;
     }
     .top nav { display: flex; gap: 48px; font-size: 13px; font-weight: 500; }
-    .top nav a:hover, .lang a:hover { text-decoration: underline; }
-    .lang { justify-self: end; font-size: 11px; font-weight: 500; }
+    .top nav a:hover { text-decoration: underline; }
+    .lang {
+      justify-self: end;
+      background: none; border: 0; padding: 0; margin: 0;
+      color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit;
+      font-size: 11px; font-weight: 500;
+      cursor: pointer;
+    }
+    .lang:hover { text-decoration: underline; }
+    .lang:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 
     /* Projects drop-down: a horizontal row under the top bar */
     .top nav button { all: unset; cursor: pointer; }
@@ -89,8 +97,8 @@
     .toast {
       position: fixed;
       left: 50%;
-      top: 96px;
-      transform: translate(-50%, -6px);
+      bottom: 44px;
+      transform: translate(-50%, 6px);
       z-index: 20;
       background: var(--red);
       color: var(--paper);
@@ -203,7 +211,7 @@
 
     /* ---------- Phone ---------- */
     @media (max-width: 640px) {
-      .toast { top: 150px; }
+      .toast { bottom: 100px; }
       body { padding: 8px; }
       .hero { min-height: calc(100vh - 16px); padding: 20px 16px 0; }
       .top { grid-template-columns: 1fr auto; }
@@ -226,14 +234,14 @@
           <img src="home-button.gif?v=2" alt="">
         </a>
         <nav>
-          <button type="button" id="projects-btn" aria-expanded="false" aria-controls="projects-menu">Projects</button>
-          <button type="button" id="about-btn">About</button>
+          <button type="button" id="projects-btn" aria-expanded="false" aria-controls="projects-menu" data-i18n="projects">Projects</button>
+          <button type="button" id="about-btn" data-i18n="about">About</button>
         </nav>
-        <div class="lang">EN</div>
+        <button type="button" class="lang" id="lang-btn" aria-label="Switch to Chinese">EN</button>
       </div>
 
       <div class="dropdown" id="projects-menu">
-        <a href="#chinatown" data-project="chinatown">Chinatown</a>
+        <a href="#chinatown" data-project="chinatown" data-i18n="chinatown">Chinatown</a>
         <!-- More projects: remove "hidden" (and point the link at a project) to show one -->
         <a href="#" hidden>Project Two</a>
         <a href="#" hidden>Project Three</a>
@@ -245,13 +253,13 @@
       <!-- Home: shown when no project is picked -->
       <main class="stage home" id="home">
         <img src="home.gif" alt="A yellow chick calmly sipping from a mug next to a laptop on fire">
-        <p class="wip">Work in Progress....</p>
+        <p class="wip" data-i18n="wip">Work in Progress....</p>
       </main>
 
       <!-- Chinatown: shown in the center when picked from the Projects menu -->
       <main class="stage" id="chinatown" hidden>
         <div class="title-row">
-          <h1>Chinatown</h1>
+          <h1 data-i18n="chinatown">Chinatown</h1>
           <div class="parts" role="group" aria-label="Chinatown projects">
             <button type="button" class="part" data-part="chinatown-1" aria-pressed="true" aria-label="Chinatown project 1">1</button>
             <button type="button" class="part" data-part="chinatown-2" aria-pressed="false" aria-label="Chinatown project 2">2</button>
@@ -262,14 +270,14 @@
         <div class="part-view" id="chinatown-1">
           <iframe data-src="chinatown-map.html?v=2" title="Chinatown NYC 3D map" allow="fullscreen"></iframe>
           <div class="credit-row">
-          <p class="credit">
+          <p class="credit" data-i18n="credit">
             Based on the Chinatown NYC Directory Map by the Chinatown Partnership
             (<a href="https://chinatown.nyc/directory-map" target="_blank" rel="noopener">chinatown.nyc/directory-map</a>).
             Original illustration by unknown artist.<br>
             Map data © OpenStreetMap contributors
             (<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">openstreetmap.org/copyright</a>).
           </p>
-          <p class="credit-wip">Work in progress...</p>
+          <p class="credit-wip" data-i18n="wip2">Work in progress...</p>
           </div>
         </div>
 
@@ -280,7 +288,7 @@
       </main>
 
       <div class="bottom" id="contact">
-        <div class="small">New York<br>School of Visual Arts<br>schen146@sva.edu</div>
+        <div class="small" data-i18n="where">New York<br>School of Visual Arts<br>schen146@sva.edu</div>
         <div></div>
         <div class="icons">
           <a href="mailto:schen146@sva.edu" aria-label="Email">@</a>
@@ -348,6 +356,39 @@
       setOpen(false);
     });
 
+    // ---------- Language: EN <-> 中文 ----------
+    // Chinese (Traditional) versions of the site's text. English comes from the page itself.
+    var ZH = {
+      projects: '作品',
+      about: '關於',
+      chinatown: '唐人街',
+      wip: '製作中....',
+      wip2: '製作中...',
+      where: '紐約<br>視覺藝術學院<br>schen146@sva.edu',
+      credit: '改編自華埠合作組織（Chinatown Partnership）的唐人街名錄地圖'
+        + '（<a href="https://chinatown.nyc/directory-map" target="_blank" rel="noopener">chinatown.nyc/directory-map</a>）。'
+        + '原插畫作者不詳。<br>'
+        + '地圖資料 © OpenStreetMap 貢獻者'
+        + '（<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">openstreetmap.org/copyright</a>）。',
+      nothing: '這裡也什麼都沒有 \u{1F642}'
+    };
+    var lang = 'en';
+    var i18nEls = document.querySelectorAll('[data-i18n]');
+    i18nEls.forEach(function (el) { el.dataset.en = el.innerHTML; });
+    var langBtn = document.getElementById('lang-btn');
+    function setLang(next) {
+      lang = next;
+      i18nEls.forEach(function (el) {
+        el.innerHTML = lang === 'zh' ? ZH[el.dataset.i18n] : el.dataset.en;
+      });
+      document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : 'en';
+      langBtn.textContent = lang === 'zh' ? '中文' : 'EN';
+      langBtn.setAttribute('aria-label', lang === 'zh' ? 'Switch to English' : 'Switch to Chinese');
+      try { localStorage.setItem('lang', lang); } catch (e) {}
+    }
+    langBtn.addEventListener('click', function () { setLang(lang === 'en' ? 'zh' : 'en'); });
+    try { if (localStorage.getItem('lang') === 'zh') setLang('zh'); } catch (e) {}
+
     // About: show a short message that fades out after a few seconds.
     var toast = document.getElementById('toast');
     var toastTimer;
@@ -359,7 +400,7 @@
     }
     document.getElementById('about-btn').addEventListener('click', function () {
       setOpen(false);
-      showToast('Nothing here either \u{1F642}');
+      showToast(lang === 'zh' ? ZH.nothing : 'Nothing here either \u{1F642}');
     });
 
     document.addEventListener('keydown', function (e) {
