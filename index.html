@@ -94,25 +94,35 @@
       line-height: 1.5;
     }
     .credit a { text-decoration: underline; text-underline-offset: 2px; }
-    /* Little message that pops up and fades (About) */
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 44px;
-      transform: translate(-50%, 6px);
+    /* About: speech bubble that pops out next to the link */
+    .about-wrap { position: relative; display: inline-block; }
+    .bubble {
+      position: absolute;
+      left: calc(100% + 18px);
+      top: -14px;
       z-index: 20;
-      background: var(--red);
-      color: var(--paper);
-      padding: 10px 18px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 500;
-      white-space: nowrap;
+      width: 180px;
+      padding: 10px 10px 12px;
+      background: #fff;
+      border: 2px solid var(--red);
+      border-radius: 18px;
+      text-align: center;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.4s ease, transform 0.4s ease;
+      transform: scale(0.85);
+      transform-origin: left 24px;
+      transition: opacity 0.25s ease, transform 0.25s cubic-bezier(.3,1.5,.5,1);
     }
-    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .bubble.show { opacity: 1; pointer-events: auto; transform: scale(1); }
+    /* little tail pointing back at "About" */
+    .bubble::before, .bubble::after {
+      content: ""; position: absolute; top: 24px; width: 0; height: 0;
+      border-top: 9px solid transparent; border-bottom: 9px solid transparent;
+    }
+    .bubble::before { left: -12px; border-right: 12px solid var(--red); transform: translateY(-50%); }
+    .bubble::after  { left: -8px;  border-right: 10px solid #fff; border-top-width: 7px; border-bottom-width: 7px; transform: translateY(-50%); }
+    .bubble img { display: block; width: 100%; height: auto; }
+    .bubble p { margin: 4px 0 0; font-size: 14px; font-weight: 500; letter-spacing: 0.08em; }
     .wip { margin: 0; font-size: 20px; font-weight: 500; letter-spacing: 0.12em; }
 
     /* Mascot in the top-left: goes back to the home page */
@@ -212,7 +222,11 @@
 
     /* ---------- Phone ---------- */
     @media (max-width: 640px) {
-      .toast { bottom: 100px; }
+      .bubble { left: 50%; top: calc(100% + 14px); transform: translateX(-50%) scale(0.85); transform-origin: 50% 0; }
+      .bubble.show { transform: translateX(-50%) scale(1); }
+      .bubble::before, .bubble::after { top: auto; left: 50%; border: 9px solid transparent; border-top: 0; transform: translateX(-50%); }
+      .bubble::before { top: -12px; border-bottom: 12px solid var(--red); border-left-width: 9px; border-right-width: 9px; }
+      .bubble::after  { top: -8px; border-bottom: 10px solid #fff; border-left-width: 7px; border-right-width: 7px; }
       body { padding: 8px; }
       .hero { min-height: calc(100vh - 16px); padding: 20px 16px 0; }
       .top { grid-template-columns: 1fr auto; }
@@ -236,7 +250,13 @@
         </a>
         <nav>
           <button type="button" id="projects-btn" aria-expanded="false" aria-controls="projects-menu" data-i18n="projects">Projects</button>
-          <button type="button" id="about-btn" data-i18n="about">About</button>
+          <span class="about-wrap">
+            <button type="button" id="about-btn" data-i18n="about" aria-expanded="false" aria-controls="about-bubble">About</button>
+            <span class="bubble" id="about-bubble" role="status">
+              <img src="about.jpg" alt="A cool character in sunglasses pointing with both hands">
+              <p data-i18n="heh">Nothing here heh</p>
+            </span>
+          </span>
         </nav>
         <button type="button" class="lang" id="lang-btn" aria-label="Switch to Chinese">EN</button>
       </div>
@@ -301,8 +321,6 @@
 
   </div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
   <script>
     // Projects drop-down: click to open/close; click elsewhere or press Esc to close.
     var btn = document.getElementById('projects-btn');
@@ -313,6 +331,7 @@
     }
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
+      setBubble(false);
       setOpen(!menu.classList.contains('open'));
     });
     document.addEventListener('click', function (e) {
@@ -371,7 +390,7 @@
         + '原插畫作者不詳。<br>'
         + '地圖資料 © OpenStreetMap 貢獻者'
         + '（<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">openstreetmap.org/copyright</a>）。',
-      nothing: '這裡也什麼都沒有 \u{1F642}'
+      heh: '這裡什麼都沒有 嘿'
     };
     var lang = 'en';
     var i18nEls = document.querySelectorAll('[data-i18n]');
@@ -390,22 +409,27 @@
     langBtn.addEventListener('click', function () { setLang(lang === 'en' ? 'zh' : 'en'); });
     try { if (localStorage.getItem('lang') === 'zh') setLang('zh'); } catch (e) {}
 
-    // About: show a short message that fades out after a few seconds.
-    var toast = document.getElementById('toast');
-    var toastTimer;
-    function showToast(text) {
-      toast.textContent = text;
-      toast.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 3000);
+    // About: pop a speech bubble out next to the link; it fades after a few seconds.
+    var aboutBtn = document.getElementById('about-btn');
+    var bubble = document.getElementById('about-bubble');
+    var bubbleTimer;
+    function setBubble(show) {
+      bubble.classList.toggle('show', show);
+      aboutBtn.setAttribute('aria-expanded', show);
+      clearTimeout(bubbleTimer);
+      if (show) bubbleTimer = setTimeout(function () { setBubble(false); }, 3500);
     }
-    document.getElementById('about-btn').addEventListener('click', function () {
+    aboutBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
       setOpen(false);
-      showToast(lang === 'zh' ? ZH.nothing : 'Nothing here either \u{1F642}');
+      setBubble(!bubble.classList.contains('show'));
+    });
+    document.addEventListener('click', function (e) {
+      if (!bubble.contains(e.target)) setBubble(false);
     });
 
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') { setOpen(false); setBubble(false); }
     });
   </script>
 </body>
