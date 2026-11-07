@@ -86,6 +86,17 @@ h1 .amt{color:var(--accent);font-style:italic;font-variant-numeric:tabular-nums}
 .sec:first-of-type{border-top:0;padding-top:0}
 .sec h3{margin:0;font-size:.95rem;font-weight:700}
 .sec .sub{margin:-6px 0 0;font-size:.78rem;color:var(--muted)}
+/* Collapsible filter sections */
+.sec-toggle{all:unset;box-sizing:border-box;display:flex;width:100%;justify-content:space-between;align-items:center;gap:8px;cursor:pointer;font-weight:700}
+.sec-toggle:focus-visible{outline:3px solid var(--jade);outline-offset:2px;border-radius:4px}
+.sec-toggle .chev{color:var(--muted);flex:none;transition:transform .2s}
+.sec-toggle:hover .chev{color:var(--ink)}
+.sec-toggle[aria-expanded="false"] .chev{transform:rotate(-90deg)}
+.sec-toggle .on-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);margin-left:6px;display:none}
+.sec-toggle[aria-expanded="false"].active .on-dot{display:inline-block}
+.sec-toggle .t{display:inline-flex;align-items:center}
+.sec-body{display:grid;gap:12px}
+.sec-body[hidden]{display:none}
 .budget-head{display:flex;justify-content:space-between;align-items:baseline}
 .budget-val{font-family:var(--f-display);font-weight:800;font-size:1.7rem;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;margin:0;cursor:pointer}
@@ -237,20 +248,26 @@ svg.map.dragging{cursor:grabbing}
       </div>
 
       <div class="sec">
-        <h3>Kind of food</h3>
-        <div class="chipset" id="cats"></div>
+        <h3><button type="button" class="sec-toggle" aria-expanded="true" aria-controls="sec-food"><span class="t">Kind of food<i class="on-dot" aria-hidden="true"></i></span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></h3>
+        <div class="sec-body" id="sec-food">
+          <div class="chipset" id="cats"></div>
+        </div>
       </div>
 
       <div class="sec">
-        <h3>Dietary needs</h3>
-        <div class="chipset"><button type="button" class="chip" id="veg" aria-pressed="false">Has a meat-free dish</button></div>
+        <h3><button type="button" class="sec-toggle" aria-expanded="true" aria-controls="sec-diet"><span class="t">Dietary needs<i class="on-dot" aria-hidden="true"></i></span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></h3>
+        <div class="sec-body" id="sec-diet">
+          <div class="chipset"><button type="button" class="chip" id="veg" aria-pressed="false">Has a meat-free dish</button></div>
+        </div>
       </div>
 
       <div class="sec">
-        <h3>Avoid allergens</h3>
-        <p class="sub">Hides spots whose popular dishes include these.</p>
-        <div class="chipset" id="allergens"></div>
-        <p class="warn">Based only on popular dishes, not full menus. Kitchens share woks and oil, so always ask staff.</p>
+        <h3><button type="button" class="sec-toggle" aria-expanded="true" aria-controls="sec-allergens"><span class="t">Avoid allergens<i class="on-dot" aria-hidden="true"></i></span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></h3>
+        <div class="sec-body" id="sec-allergens">
+          <p class="sub">Hides spots whose popular dishes include these.</p>
+          <div class="chipset" id="allergens"></div>
+          <p class="warn">Based only on popular dishes, not full menus. Kitchens share woks and oil, so always ask staff.</p>
+        </div>
       </div>
     </div>
     <div class="side-foot">
@@ -516,6 +533,18 @@ const q = $("#q");
 q.addEventListener("input",()=>{ query = q.value.trim().toLowerCase(); $("#qclear").hidden = !q.value; render(); });
 $("#qclear").addEventListener("click",()=>{ q.value=""; query=""; $("#qclear").hidden=true; render(); q.focus(); });
 
+/* ---------- Collapsible filter sections ---------- */
+document.querySelectorAll(".sec-toggle").forEach(b=>b.addEventListener("click",()=>{
+  const open = b.getAttribute("aria-expanded")!=="true";
+  b.setAttribute("aria-expanded", String(open));
+  document.getElementById(b.getAttribute("aria-controls")).hidden = !open;
+}));
+/* a red dot on a collapsed section's title means a filter inside it is on */
+function markActive(){
+  const on = {"sec-food": cat!=="all", "sec-diet": vegOnly, "sec-allergens": skip.size>0};
+  document.querySelectorAll(".sec-toggle").forEach(b=>b.classList.toggle("active", !!on[b.getAttribute("aria-controls")]));
+}
+
 /* ---------- Map dots ---------- */
 const dotsG = $("#dots");
 SHOPS.filter(s=>s.x!==null).forEach(s => {
@@ -579,6 +608,7 @@ function card(s, n, over){
     </div></article>`;
 }
 function render(){
+  markActive();
   const pool = SHOPS.filter(passes);
   const fits = pool.filter(s=>status(s)!=="none")
     .sort((a,b)=> (status(a)==="full"?0:1)-(status(b)==="full"?0:1) || orders(b)-orders(a) || a.lo-b.lo || a.name.localeCompare(b.name));
