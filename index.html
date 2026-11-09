@@ -134,7 +134,7 @@
     /* Title with circled part numbers (1, 2, ...) */
     .title-row { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
     .parts { display: flex; gap: 10px; }
-    .part {
+    .part, .full-btn {
       all: unset;
       box-sizing: border-box;
       width: 40px; height: 40px;
@@ -144,9 +144,24 @@
       font-size: 18px; font-weight: 700;
       cursor: pointer;
     }
-    .part:hover { background: rgba(232, 57, 43, 0.12); }
+    .part:hover, .full-btn:hover { background: rgba(232, 57, 43, 0.12); }
     .part[aria-pressed="true"] { background: var(--red); color: var(--paper); }
-    .part:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+    .part:focus-visible, .full-btn:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+    .full-btn { margin-left: 6px; }
+
+    /* Fallback full screen (phones that can't do real full screen, e.g. iPhone) */
+    .part-view.fake-full { position: fixed; inset: 0; z-index: 100; background: var(--paper); padding: 0; }
+    .part-view.fake-full iframe { min-height: 0; height: 100%; border: 0; }
+    .part-view.fake-full .credit-row { display: none; }
+    .exit-full {
+      display: none;
+      position: fixed; top: 12px; right: 12px; z-index: 101;
+      background: var(--red); color: var(--paper);
+      border: 0; border-radius: 999px; padding: 8px 14px;
+      font: inherit; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+      cursor: pointer;
+    }
+    .part-view.fake-full .exit-full { display: block; }
     .part-view { width: 100%; flex: 1; display: flex; flex-direction: column; }
     .part-view[hidden] { display: none; }
     .placeholder {
@@ -284,11 +299,15 @@
           <div class="parts" role="group" aria-label="Chinatown projects">
             <button type="button" class="part" data-part="chinatown-1" aria-pressed="true" aria-label="Chinatown project 1">1</button>
             <button type="button" class="part" data-part="chinatown-2" aria-pressed="false" aria-label="Chinatown project 2">2</button>
+            <button type="button" class="full-btn" aria-label="Full screen" title="Full screen">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+            </button>
           </div>
         </div>
 
         <!-- Chinatown 1: 3D map -->
         <div class="part-view" id="chinatown-1">
+          <button type="button" class="exit-full" data-i18n="exitfull">Exit full screen ✕</button>
           <iframe data-src="chinatown-map.html?v=4" title="Chinatown NYC 3D map" allow="fullscreen"></iframe>
           <div class="credit-row">
           <p class="credit" data-i18n="credit">
@@ -304,7 +323,8 @@
 
         <!-- Chinatown 2: What $10 buys in Chinatown -->
         <div class="part-view" id="chinatown-2" hidden>
-          <iframe data-src="chinatown-10-dollars.html?v=2.4" title="What $10 buys in Chinatown"></iframe>
+          <button type="button" class="exit-full" data-i18n="exitfull">Exit full screen ✕</button>
+          <iframe data-src="chinatown-10-dollars.html?v=2.4" title="What $10 buys in Chinatown" allow="fullscreen"></iframe>
         </div>
       </main>
 
@@ -390,6 +410,7 @@
         + '原插畫作者不詳。<br>'
         + '地圖資料 © OpenStreetMap 貢獻者'
         + '（<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">openstreetmap.org/copyright</a>）。',
+      exitfull: '退出全螢幕 ✕',
       heh: '這裡什麼都沒有 嘿'
     };
     var lang = 'en';
@@ -428,8 +449,31 @@
       if (!bubble.contains(e.target)) setBubble(false);
     });
 
+    // Full screen: enlarge the project currently showing under the title.
+    function currentFrame() {
+      var view = document.querySelector('#chinatown .part-view:not([hidden])');
+      return view && { view: view, frame: view.querySelector('iframe') };
+    }
+    function exitFake() {
+      document.querySelectorAll('.part-view.fake-full').forEach(function (v) { v.classList.remove('fake-full'); });
+      document.body.style.overflow = '';
+    }
+    document.querySelector('.full-btn').addEventListener('click', function () {
+      var cur = currentFrame(); if (!cur) return;
+      var f = cur.frame;
+      var req = f.requestFullscreen || f.webkitRequestFullscreen;
+      if (req) {
+        var r = req.call(f);
+        if (r && r.catch) r.catch(function () { cur.view.classList.add('fake-full'); document.body.style.overflow = 'hidden'; });
+      } else {
+        // no real full screen available (iPhone): fill the window instead
+        cur.view.classList.add('fake-full'); document.body.style.overflow = 'hidden';
+      }
+    });
+    document.querySelectorAll('.exit-full').forEach(function (b) { b.addEventListener('click', exitFake); });
+
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { setOpen(false); setBubble(false); }
+      if (e.key === 'Escape') { setOpen(false); setBubble(false); exitFake(); }
     });
   </script>
 </body>
