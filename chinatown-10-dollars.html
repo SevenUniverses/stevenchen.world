@@ -211,6 +211,9 @@ svg.map{position:absolute;inset:0;width:100%;height:100%;display:block}
 .zoom button + button{border-top:1px solid var(--line)}
 .zoom button:hover{background:var(--bg)}
 svg.map{cursor:grab;touch-action:none}
+/* dragging the map shouldn't select (highlight) street names or labels */
+.mapcol,.mapcol svg.map text{-webkit-user-select:none;user-select:none}
+.mapcol input{-webkit-user-select:text;user-select:text}
 svg.map.dragging{cursor:grabbing}
 @media (max-width:760px){.maplegend{display:none}}
 @media (max-width:1180px) and (min-width:761px){.maplegend{display:none}}
