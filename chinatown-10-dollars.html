@@ -202,7 +202,9 @@ svg.map{position:absolute;inset:0;width:100%;height:100%;display:block}
 .gobtn{display:flex;justify-content:center;background:var(--jade);color:var(--paper);font-weight:800;text-decoration:none;padding:10px;border-radius:8px}
 .gobtn:hover{filter:brightness(1.08)}
 .bullet{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:700;font-size:.66rem;color:#fff}
-.go.min .go-body{display:none}
+.go.min .go-body{display:none!important}
+.go.min{width:auto;padding:8px 12px}
+.go.min .go-head{gap:14px}
 .iconbtn{border:0;background:none;cursor:pointer;color:var(--muted);font-size:.78rem;font-weight:600;padding:2px 4px}
 .zoom{top:16px;right:16px;display:flex;flex-direction:column;overflow:hidden}
 .zoom button{border:0;background:var(--paper);width:38px;height:38px;font-size:1.2rem;font-weight:700;cursor:pointer;color:var(--ink)}
@@ -361,8 +363,8 @@ svg.map.dragging{cursor:grabbing}
       <span><i class="sw none"></i>Costs more</span>
       <span><i class="sw dest"></i>Destination</span>
     </div>
-    <div class="float go" id="go">
-      <div class="go-head"><h3>Get there</h3><button type="button" class="iconbtn" id="goMin" aria-expanded="true">Hide</button></div>
+    <div class="float go min" id="go">
+      <div class="go-head"><h3>Get there</h3><button type="button" class="iconbtn" id="goMin" aria-expanded="false">Show</button></div>
       <div class="go-body" style="display:grid;gap:10px">
         <div><div class="go-to" id="goName"></div><div class="go-sub" id="goSub"></div></div>
         <label class="label" for="from">Starting from</label>
@@ -577,8 +579,12 @@ function showTag(s){
   tag.setAttribute("visibility","visible");
 }
 function hl(id,on){
-  const d = dotsG.querySelector(`[data-id="${id}"]`); if (d){ d.classList.toggle("hl",on); if(on) dotsG.appendChild(d); }
-  const c = document.querySelector(`.card[data-id="${id}"]`); if (c) c.classList.toggle("hl",on);
+  // only one point/card is highlighted at a time; don't move the dot in the DOM here,
+  // because doing that mid-hover cancels the click that follows
+  document.querySelectorAll(".dot.hl,.card.hl").forEach(x=>x.classList.remove("hl"));
+  if (!on) return;
+  const d = dotsG.querySelector(`[data-id="${id}"]`); if (d) d.classList.add("hl");
+  const c = document.querySelector(`.card[data-id="${id}"]`); if (c) c.classList.add("hl");
 }
 function select(id, fromMap){
   selected = selected === id && fromMap ? null : id;
