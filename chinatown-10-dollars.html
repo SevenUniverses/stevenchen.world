@@ -130,6 +130,9 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;bac
 .card{display:grid;grid-template-columns:104px minmax(0,1fr);gap:16px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
 .card:hover,.card.hl{border-color:var(--ink)}
 .card.sel{border-color:var(--jade);box-shadow:0 0 0 2px var(--jade)}
+.card.flash{animation:flash 1.1s ease-out}
+@keyframes flash{0%,30%{background:var(--jade-soft)}100%{background:var(--paper)}}
+@media (prefers-reduced-motion:reduce){.card.flash{animation:none}}
 .card:focus-visible{outline:3px solid var(--jade);outline-offset:2px}
 .tile{position:relative;border-radius:8px;background:var(--tile);display:grid;place-items:center;padding:24px 8px 10px;min-height:112px;text-align:center;overflow:hidden}
 .tile .zh{font-family:var(--f-zh);font-weight:700;font-size:1.15rem;line-height:1.25;color:var(--accent);word-break:break-all}
@@ -584,10 +587,26 @@ function select(id, fromMap){
   const sd = selected && dotsG.querySelector(`[data-id="${selected}"]`); if (sd) dotsG.appendChild(sd);
   document.querySelectorAll(".card").forEach(c=>c.classList.toggle("sel", +c.dataset.id===selected));
   showTag(selected ? byId(selected) : null);
-  if (fromMap && selected){
-    const el = document.querySelector(`.card[data-id="${selected}"]`), list = $("#list");
-    if (el) list.scrollTo({top: Math.max(0, el.offsetTop - list.offsetTop - 12), behavior: smooth()});
+  if (fromMap && selected) jumpToCard(selected);
+}
+/* Clicking a map point jumps straight to that eatery's card (name and prices) in the list */
+function jumpToCard(id){
+  const el = document.querySelector(`.card[data-id="${id}"]`), list = $("#list");
+  if (!el) return;
+  // 1. make sure the list itself is on screen
+  const lr = list.getBoundingClientRect();
+  if (matchMedia("(max-width:760px)").matches){
+    // phone layout: list sits under the map, so bring the list's top into view
+    window.scrollTo({top: window.scrollY + lr.top, behavior: "auto"});
+  } else {
+    const app = document.querySelector(".app").getBoundingClientRect();
+    if (app.top < 0 || lr.bottom > innerHeight) window.scrollTo({top: window.scrollY + app.top, behavior: "auto"});
   }
+  // 2. jump the list straight to the card
+  const cr = el.getBoundingClientRect(), lr2 = list.getBoundingClientRect();
+  list.scrollTop += cr.top - lr2.top - 12;
+  // 3. flash it so it's easy to spot
+  el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
 }
 
 /* ---------- List ---------- */
