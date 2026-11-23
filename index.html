@@ -278,6 +278,7 @@
 
       <div class="dropdown" id="projects-menu">
         <a href="#chinatown" data-project="chinatown" data-i18n="chinatown">Chinatown</a>
+        <a href="#ny-seafood" data-project="ny-seafood" data-i18n="nyseafood">NY Seafood</a>
         <!-- More projects: remove "hidden" (and point the link at a project) to show one -->
         <a href="#" hidden>Project Two</a>
         <a href="#" hidden>Project Three</a>
@@ -325,6 +326,24 @@
         <div class="part-view" id="chinatown-2" hidden>
           <button type="button" class="exit-full" data-i18n="exitfull">Exit full screen ✕</button>
           <iframe data-src="chinatown-10-dollars.html?v=2.6" title="What $10 buys in Chinatown" allow="fullscreen"></iframe>
+        </div>
+      </main>
+
+      <!-- NY Seafood: shown in the center when picked from the Projects menu -->
+      <main class="stage" id="ny-seafood" hidden>
+        <div class="title-row">
+          <h1 data-i18n="nyseafood">NY Seafood</h1>
+          <div class="parts" role="group" aria-label="NY Seafood project">
+            <button type="button" class="full-btn" aria-label="Full screen" title="Full screen">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- NY Seafood 1: the seafood map of New York -->
+        <div class="part-view" id="ny-seafood-1">
+          <button type="button" class="exit-full" data-i18n="exitfull">Exit full screen ✕</button>
+          <iframe data-src="ny-seafood-map.html?v=1" title="The seafood map of New York" allow="fullscreen" style="background:#f5f5f1"></iframe>
         </div>
       </main>
 
@@ -402,6 +421,7 @@
       projects: '作品',
       about: '關於',
       chinatown: '唐人街',
+      nyseafood: '紐約海鮮',
       wip: '製作中....',
       wip2: '製作中...',
       where: '紐約<br>視覺藝術學院<br>schen146@sva.edu',
@@ -451,14 +471,14 @@
 
     // Full screen: enlarge the project currently showing under the title.
     function currentFrame() {
-      var view = document.querySelector('#chinatown .part-view:not([hidden])');
+      var view = document.querySelector('.stage:not([hidden]) .part-view:not([hidden])');
       return view && { view: view, frame: view.querySelector('iframe') };
     }
     function exitFake() {
       document.querySelectorAll('.part-view.fake-full').forEach(function (v) { v.classList.remove('fake-full'); });
       document.body.style.overflow = '';
     }
-    document.querySelector('.full-btn').addEventListener('click', function () {
+    document.querySelectorAll('.full-btn').forEach(function (fb) { fb.addEventListener('click', function () {
       var cur = currentFrame(); if (!cur) return;
       var f = cur.frame;
       var req = f.requestFullscreen || f.webkitRequestFullscreen;
@@ -469,7 +489,7 @@
         // no real full screen available (iPhone): fill the window instead
         cur.view.classList.add('fake-full'); document.body.style.overflow = 'hidden';
       }
-    });
+    }); });
     document.querySelectorAll('.exit-full').forEach(function (b) { b.addEventListener('click', exitFake); });
 
     document.addEventListener('keydown', function (e) {

@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NY Seafood Map</title>
+<link rel="icon" type="image/gif" href="favicon.gif?v=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee+Inline&family=Bungee+Shade&family=Barlow+Condensed:wght@300;400;600;800&family=Yellowtail&display=swap">
+<style>
+/* Layout: a two-ink risograph poster sheet. Title column + big map up top, then a grid of ruled infographic cells. */
+:root{
+  --paper:#f5f5f1;
+  --surround:#d9d8d2;
+  --red:#d1373f;
+  --blue:#3c95d6;
+  --blue-tint:#bcdaf1;
+  --red-tint:#f3c9c9;
+  --display:"Bungee Inline","Bungee",Impact,"Arial Black",sans-serif;
+  --shade:"Bungee Shade","Bungee Inline",Impact,sans-serif;
+  --cond:"Barlow Condensed","Arial Narrow","Roboto Condensed",sans-serif;
+  --script:"Yellowtail","Brush Script MT",cursive;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--surround);color:var(--red);font-family:var(--cond);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px}
+.sheet{max-width:1180px;margin:0 auto;background:var(--paper);padding:clamp(14px,3vw,36px);position:relative;
+  box-shadow:0 1px 0 rgba(0,0,0,.08),0 18px 40px -20px rgba(40,30,30,.35)}
+.sheet::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5  0 0 0 0 .45  0 0 0 0 .45  0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+svg{display:block;width:100%;height:auto;max-width:100%}
+.mis{color:var(--red);text-shadow:2px 2px 0 var(--blue)}
+
+/* top */
+.top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.25fr);gap:22px;align-items:start}
+.title{display:flex;flex-direction:column;gap:14px}
+h1{margin:0;font-family:var(--display);font-weight:400;line-height:.86;font-size:clamp(40px,5.2vw,66px);letter-spacing:-.01em}
+h1 span{display:block}
+h1 .shade{font-family:var(--shade);color:var(--red);text-shadow:3px 3px 0 var(--blue)}
+.sub{font-family:var(--cond);font-weight:800;font-size:22px;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);
+  border-top:2px solid var(--red);border-bottom:2px solid var(--red);padding:6px 0;text-wrap:balance}
+.intro{font-size:15.5px;line-height:1.35;text-transform:uppercase;letter-spacing:.02em;margin:0;color:var(--red)}
+.intro b{color:var(--blue);font-weight:800}
+.credit{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin:0}
+.half{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;border:2px solid var(--red);padding:10px;position:relative}
+.half::before{content:"";position:absolute;inset:4px;border:1px dashed var(--blue);pointer-events:none}
+.half .big{font-family:var(--cond);font-weight:300;font-size:64px;line-height:.8;color:var(--blue)}
+.half p{margin:0;font-weight:600;text-transform:uppercase;font-size:15px;line-height:1.1}
+.mapwrap{border:2px solid var(--red);padding:5px;position:relative}
+.mapwrap::before{content:"";position:absolute;inset:3px;border:1px solid var(--blue);pointer-events:none}
+
+/* map styles */
+.map .paper{fill:var(--paper)}
+.map .grat line{stroke:var(--blue);stroke-width:.6;opacity:.55}
+.map .water{fill:url(#hatch);stroke:var(--blue);stroke-width:1.2}
+.map .land{fill:var(--paper);stroke:var(--red);stroke-width:2.2;stroke-linejoin:round}
+.map .landreg{fill:none;stroke:var(--blue);stroke-width:1.2;stroke-linejoin:round;opacity:.8}
+.map .lakes polyline{fill:none;stroke:var(--blue);stroke-width:5;stroke-linecap:round}
+.map .rivers polyline{fill:none;stroke:var(--blue);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.map .city{fill:var(--paper);stroke:var(--red);stroke-width:1.6}
+.map text{font-family:var(--cond)}
+.map .clab{font-size:10.5px;font-weight:800;fill:var(--red);letter-spacing:.05em;paint-order:stroke;stroke:var(--paper);stroke-width:3px}
+.map .wlab{font-size:15px;font-weight:600;fill:var(--blue);letter-spacing:.35em;font-style:italic}
+.map .blab{font-size:13px;font-weight:600;fill:var(--blue);letter-spacing:.3em}
+.map .alab{font-size:11px;font-weight:800;fill:var(--blue);letter-spacing:.18em;paint-order:stroke;stroke:var(--paper);stroke-width:3px}
+.map .leader{fill:none;stroke:var(--red);stroke-width:1.2;stroke-dasharray:3 3}
+.map .pin{fill:var(--paper);stroke:var(--red);stroke-width:2}
+.map .bx{fill:var(--paper);stroke:var(--red);stroke-width:1.6}
+.map .bxs{fill:var(--blue)}
+.map .bxh{fill:var(--red)}
+.map .bxin{fill:none;stroke:var(--blue);stroke-width:1;stroke-dasharray:2 2}
+.map .bxt{fill:var(--paper);font-size:12px;font-weight:800;letter-spacing:.12em;text-anchor:middle}
+.map .bl1{fill:var(--blue);font-size:15px;font-weight:800}
+.map .bl2{fill:var(--red);font-size:12px;font-weight:600;letter-spacing:.04em}
+.map .bl3{fill:var(--red);font-size:11px;font-weight:800;letter-spacing:.08em}
+.map .kick{fill:var(--red);font-size:11.5px;font-weight:600;letter-spacing:.12em;text-anchor:middle}
+.map .cart{fill:var(--red);font-family:var(--display);font-size:38px;text-anchor:middle;stroke:var(--blue);stroke-width:0;filter:drop-shadow(2px 2px 0 var(--blue))}
+.map .leg{fill:var(--red);font-size:11.5px;font-weight:800;letter-spacing:.06em}
+.map .compass circle{fill:var(--paper);stroke:var(--red);stroke-width:1.5}
+.map .compass .cin{stroke:var(--blue);stroke-dasharray:2 2}
+.map .compass path{fill:var(--blue);stroke:var(--red);stroke-width:1}
+
+/* cells */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:22px}
+.cell{border:2px solid var(--red);padding:16px 14px 14px;position:relative;display:flex;flex-direction:column;gap:10px;min-width:0}
+.cell::before{content:"";position:absolute;inset:4px;border:1px solid var(--blue);pointer-events:none}
+.cell.w2{grid-column:span 2}
+.cell.w3{grid-column:1/-1}
+.tag{align-self:flex-start;font-weight:800;font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--paper);background:var(--red);padding:3px 9px;box-shadow:3px 3px 0 var(--blue)}
+.scr{font-family:var(--script);font-size:34px;line-height:1;color:var(--red);text-shadow:1.5px 1.5px 0 var(--blue)}
+.hd{font-family:var(--display);font-size:26px;line-height:.95;color:var(--red);text-shadow:2px 2px 0 var(--blue);margin:0;text-wrap:balance}
+.num{font-family:var(--cond);font-weight:300;font-size:clamp(56px,7vw,92px);line-height:.82;color:var(--blue);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.num small{font-size:.32em;font-weight:800;letter-spacing:.06em;color:var(--red);vertical-align:top;margin-left:4px}
+.cap{margin:0;font-weight:600;text-transform:uppercase;font-size:15px;line-height:1.15;letter-spacing:.03em}
+.cap b{color:var(--blue);font-weight:800}
+.fine{margin:0;font-size:12.5px;line-height:1.3;text-transform:uppercase;letter-spacing:.04em;color:var(--red)}
+.row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+
+/* drawings */
+.ink{fill:var(--paper);stroke:var(--red);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+.inkn{fill:none;stroke:var(--red);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+.bl{fill:var(--blue);stroke:none}
+.blt{fill:var(--blue-tint);stroke:none}
+.bls{fill:none;stroke:var(--blue);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rd{fill:var(--red);stroke:none}
+.cut{fill:none;stroke:var(--blue);stroke-width:1.5;stroke-dasharray:5 4}
+.tx{font-family:var(--cond);font-weight:800;fill:var(--red);letter-spacing:.06em}
+.txb{font-family:var(--cond);font-weight:800;fill:var(--blue);letter-spacing:.06em}
+
+/* day ledger */
+.ledger{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.col h4{margin:0 0 6px;font-weight:800;font-size:13px;letter-spacing:.2em;color:var(--blue);border-bottom:2px solid var(--red);padding-bottom:3px}
+.li{display:grid;grid-template-columns:34px 1fr;gap:6px;align-items:center;padding:5px 0;border-bottom:1px dashed var(--blue)}
+.li .v{font-weight:300;font-size:30px;line-height:.9;color:var(--blue);font-variant-numeric:tabular-nums}
+.li .v small{font-size:13px;font-weight:800;color:var(--red);margin-left:3px}
+.li .k{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;border-left:2px solid var(--red);padding:0 0 0 8px;display:flex;flex-direction:column;gap:5px}
+.steps li::before{content:counter(s) ".";font-family:var(--display);font-size:22px;color:var(--blue);line-height:1}
+.steps b{font-weight:800;text-transform:uppercase;font-size:14.5px;letter-spacing:.04em;line-height:1.05}
+.steps span{font-size:12.5px;text-transform:uppercase;line-height:1.2;letter-spacing:.03em}
+.steps svg{height:52px;width:auto}
+
+.refs{columns:2;column-gap:28px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;line-height:1.35;margin:0;padding-left:18px}
+.refs li{break-inside:avoid;margin-bottom:4px}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);border-top:2px solid var(--red);padding-top:8px}
+
+@media (max-width:900px){
+  .top{grid-template-columns:1fr}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cell.w2{grid-column:1/-1}
+  .steps{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:16px}
+}
+@media (max-width:600px){
+  body{padding-block:0}
+  .grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .refs{columns:1}
+  .mapwrap{overflow-x:auto}
+  .mapwrap svg{min-width:560px}
+}
+.map .imp{fill:none;stroke:var(--red);stroke-width:2.4;stroke-dasharray:8 5;marker-end:url(#arr)}
+.map .exp{fill:none;stroke:var(--blue);stroke-width:2.4;stroke-dasharray:8 5;marker-end:url(#arrb)}
+.map .arl{font-size:11px;font-weight:800;fill:var(--red);letter-spacing:.1em}
+.map .arl2{font-size:12px;font-weight:800;fill:var(--blue);letter-spacing:.12em}
+.map .arl3{font-size:10.5px;font-weight:600;fill:var(--blue);letter-spacing:.08em}
+.species{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;margin:0;padding:0;list-style:none}
+.species li{display:grid;grid-template-columns:44px 1fr;gap:8px;align-items:center;border-bottom:1px dashed var(--blue);padding-bottom:6px}
+.species svg{width:44px;height:26px}
+.species b{display:block;font-weight:800;text-transform:uppercase;font-size:14px;letter-spacing:.04em;line-height:1}
+.species span{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--blue);font-weight:600}
+.lanes{display:grid;gap:14px}
+.lane{display:grid;grid-template-columns:130px minmax(0,1fr);gap:12px;align-items:start}
+.lane h3{margin:0;font-family:var(--display);font-weight:400;font-size:20px;line-height:1;color:var(--red);text-shadow:1.5px 1.5px 0 var(--blue)}
+.lane h3 small{display:block;font-family:var(--cond);font-weight:800;font-size:12px;letter-spacing:.1em;color:var(--blue);text-shadow:none;margin-top:4px}
+.lane .steps{grid-template-columns:repeat(5,minmax(0,1fr))}
+.lane.fast .steps{grid-template-columns:repeat(4,minmax(0,1fr))}
+.tl{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;position:relative}
+.tl::before{content:"";position:absolute;left:0;right:0;top:10px;border-top:2px dashed var(--blue)}
+.tl li{position:relative;display:flex;flex-direction:column;gap:4px}
+.tl .yr{align-self:flex-start;font-family:var(--display);font-size:20px;line-height:1;background:var(--paper);color:var(--red);text-shadow:1.5px 1.5px 0 var(--blue);padding-right:6px}
+.tl b{font-weight:800;text-transform:uppercase;font-size:14px;letter-spacing:.03em;line-height:1.05}
+.tl span{font-size:12.5px;text-transform:uppercase;letter-spacing:.03em;line-height:1.2}
+@media (max-width:900px){.lane{grid-template-columns:1fr}.lane .steps,.lane.fast .steps{grid-template-columns:repeat(3,minmax(0,1fr))}.tl{grid-template-columns:repeat(2,minmax(0,1fr))}.tl::before{display:none}}
+@media (max-width:600px){.species{grid-template-columns:1fr}.lane .steps,.lane.fast .steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* retro hover: inks swap, panel lifts, scanline highlight blinks in and out */
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes flickin{0%{opacity:0}10%{opacity:1}20%{opacity:0}30%{opacity:1}100%{opacity:1}}
+.cell,.half{transition:transform .08s steps(2),box-shadow .08s steps(2);outline:none}
+.cell::after,.half::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;mix-blend-mode:multiply;
+  background:repeating-linear-gradient(0deg,var(--blue-tint) 0 2px,transparent 2px 4px),
+             linear-gradient(var(--red-tint),var(--red-tint))}
+.cell:hover,.cell:focus-visible,.half:hover,.half:focus-visible{border-color:var(--blue);transform:translate(-3px,-3px);box-shadow:6px 6px 0 var(--red)}
+.cell:hover::before,.cell:focus-visible::before,.half:hover::before,.half:focus-visible::before{border-color:var(--red);border-style:dashed}
+.cell:hover::after,.cell:focus-visible::after,.half:hover::after,.half:focus-visible::after{animation:flickin .35s steps(1) forwards,blink .7s steps(1) .35s infinite}
+.cell:hover .tag,.cell:focus-visible .tag{background:var(--blue);box-shadow:3px 3px 0 var(--red)}
+.map .hot{cursor:default;outline:none}
+.map .scan{fill:url(#scanpat);opacity:0;pointer-events:none;mix-blend-mode:multiply}
+.map .hot:hover .scan,.map .hot:focus-visible .scan{animation:flickin .35s steps(1) forwards,blink .7s steps(1) .35s infinite}
+.map .hot{cursor:pointer}
+.map .lift{transition:transform .08s steps(2)}
+.map .hot:hover .lift,.map .hot:focus-visible .lift{transform:translate(-4px,-4px)}
+.map .hot:hover .bxs,.map .hot:focus-visible .bxs{transform:translate(2px,2px)}
+.map .inr{fill:none;stroke:transparent;stroke-width:1;stroke-dasharray:3 2;pointer-events:none}
+.map .hot:hover .inr,.map .hot:focus-visible .inr{stroke:var(--red)}
+.map .hot:hover .bxh,.map .hot:focus-visible .bxh{fill:var(--blue)}
+.map .hot:hover .bxs,.map .hot:focus-visible .bxs{fill:var(--red)}
+.map .hot:hover .bx,.map .hot:focus-visible .bx{stroke:var(--blue)}
+.map .hot:hover .leader,.map .hot:focus-visible .leader{stroke:var(--blue);stroke-dasharray:none}
+@media (prefers-reduced-motion:reduce){
+  .cell,.half{transition:none}
+  .cell:hover::after,.cell:focus-visible::after,.half:hover::after,.half:focus-visible::after,
+  .map .hot:hover .scan,.map .hot:focus-visible .scan{animation:none;opacity:.8}
+}
+
+.map .mover{pointer-events:none}
+.mapwrap{cursor:default}
+
+/* hero: map first, about three quarters of the screen tall, title row underneath */
+.top{display:flex;flex-direction:column;align-items:center;gap:clamp(28px,5vh,56px)}
+.top .mapwrap{width:min(100%,calc(75vh * 800 / 610 + 14px));width:min(100%,calc(75svh * 800 / 610 + 14px))}
+.top .title{width:100%;display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr) minmax(0,260px);gap:16px 28px;align-items:start;
+  border-top:2px solid var(--red);padding-top:20px}
+.top .title h1{grid-row:span 2}
+.top .title .sub{margin:0}
+.top .title .intro{grid-column:2;grid-row:2}
+.top .title .half{grid-column:3;grid-row:1 / span 2;align-self:start}
+.top .title .credit{grid-column:3;grid-row:3}
+@media (max-width:900px){
+  .top .title{grid-template-columns:minmax(0,1fr)}
+  .top .title h1,.top .title .intro,.top .title .half,.top .title .credit{grid-column:auto;grid-row:auto}
+}
+
+/* shown inside the stevenchen.world project frame: drop the outer sheet and let the map fill the frame */
+.embed body{background:var(--paper);padding:8px}
+.embed .sheet{max-width:none;padding:0;background:var(--paper);box-shadow:none}
+.embed .sheet::after{display:none}
+.embed .top{gap:0}
+.embed .top .mapwrap{width:min(100%,calc((100vh - 16px) * 800 / 610))}
+.embed .mapwrap svg{min-width:0!important}
+.embed .top{min-height:calc(100vh - 16px);justify-content:center}
+</style>
+<script>try{if(window.self!==window.top)document.documentElement.classList.add('embed')}catch(e){document.documentElement.classList.add('embed')}</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+      <rect width="6" height="6" fill="var(--paper)"/><line x1="0" y1="0" x2="0" y2="6" stroke="var(--blue)" stroke-width="1.4"/>
+    </pattern>
+    <pattern id="hatchr" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="5" height="5" fill="var(--paper)"/><line x1="0" y1="0" x2="0" y2="5" stroke="var(--red)" stroke-width="1.6"/>
+    </pattern>
+    <pattern id="dots" width="5" height="5" patternUnits="userSpaceOnUse">
+      <rect width="5" height="5" fill="var(--paper)"/><circle cx="2.5" cy="2.5" r="1.1" fill="var(--blue)"/>
+    </pattern>
+    <pattern id="scanpat" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="4" fill="var(--red-tint)"/><rect width="4" height="2" fill="var(--blue-tint)"/></pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="var(--red)"/></marker>
+    <marker id="arrb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="var(--blue)"/></marker>
+    <symbol id="fish" viewBox="0 0 20 10">
+      <path d="M2 5 Q7 0 13 2 L17 5 L13 8 Q7 10 2 5Z" fill="var(--paper)" stroke="var(--red)" stroke-width="1.1" stroke-linejoin="round"/>
+      <path d="M16.5 5 L19.5 1.5 V8.5Z" fill="var(--blue)"/>
+      <path d="M6 3.6 Q9 5 6 6.6 M9.5 3 Q12 5 9.5 7" fill="none" stroke="var(--blue)" stroke-width=".9"/>
+      <circle cx="4" cy="4.6" r=".9" fill="var(--red)"/>
+    </symbol>
+    <symbol id="fishr" viewBox="0 0 20 10">
+      <path d="M2 5 Q7 0 13 2 L17 5 L13 8 Q7 10 2 5Z" fill="var(--red)" stroke="var(--red)" stroke-width="1.1" stroke-linejoin="round"/>
+      <path d="M16.5 5 L19.5 1.5 V8.5Z" fill="var(--red)"/>
+      <circle cx="4" cy="4.6" r="1" fill="var(--paper)"/>
+    </symbol>
+    <symbol id="fisho" viewBox="0 0 20 10">
+      <path d="M2 5 Q7 0 13 2 L17 5 L13 8 Q7 10 2 5Z" fill="var(--paper)" stroke="var(--blue)" stroke-width="1.1" stroke-linejoin="round"/>
+      <path d="M16.5 5 L19.5 1.5 V8.5Z" fill="none" stroke="var(--blue)" stroke-width="1"/>
+      <circle cx="4" cy="4.6" r=".9" fill="var(--blue)"/>
+    </symbol>
+    <symbol id="oyster" viewBox="0 0 12 10">
+      <path d="M1 6 Q2 1 6 1 Q11 1 11 5 Q10 9 5 9 Q1 9 1 6Z" fill="var(--blue-tint)" stroke="var(--blue)" stroke-width="1"/>
+      <path d="M3 6 Q5 3 9 4 M3.5 7.5 Q6 6 9.5 6" fill="none" stroke="var(--blue)" stroke-width=".8"/>
+    </symbol>
+    <symbol id="boat" viewBox="0 0 18 14">
+      <path d="M1 9 H17 L14.5 13 H3.5Z" fill="var(--red)"/>
+      <path d="M5 9 V5 H10 V9" fill="var(--paper)" stroke="var(--red)" stroke-width="1.1"/>
+      <path d="M12 9 V1 M12 2 L16 7" fill="none" stroke="var(--red)" stroke-width="1.1"/>
+    </symbol>
+    <symbol id="plane" viewBox="0 0 26 18">
+      <path d="M2 9 Q2 7 5 7 H22 Q25 8 22 10 H5 Q2 10 2 9Z M11 7 L7 1 H10 L16 7 M11 10 L7 16 H10 L16 10 M4 7 L2 3 H4 L7 7" fill="var(--paper)" stroke="var(--red)" stroke-width="1.2" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="ship" viewBox="0 0 30 16">
+      <path d="M1 9 H29 L25 15 H4Z" fill="var(--red)"/>
+      <path d="M5 9 V5 H10 V9 M10 9 V5 H15 V9 M15 9 V5 H20 V9 M8 5 V2 H13 V5" fill="var(--blue-tint)" stroke="var(--blue)" stroke-width="1"/>
+      <path d="M23 9 V3 H27 V9" fill="var(--paper)" stroke="var(--red)" stroke-width="1.1"/>
+    </symbol>
+    <symbol id="city" viewBox="0 0 30 28">
+      <path d="M2 27 V14 h5 V8 h4 V2 h3 v6 h3 V11 h5 V6 h4 V27Z" fill="var(--paper)" stroke="var(--red)" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M4 17h1M4 20h1M4 23h1M9 11h1M9 14h1M9 17h1M9 20h1M15 12h1M15 15h1M15 18h1M19 14h1M19 17h1M24 9h1M24 12h1M24 15h1M24 18h1" stroke="var(--blue)" stroke-width="1.4"/>
+    </symbol>
+  </defs>
+</svg>
+
+<main class="sheet" aria-label="The seafood map of New York">
+  <section class="top">
+    <div class="mapwrap">
+<svg class="map" viewBox="0 0 800 610" role="img" aria-label="Map of New York State and the New York Bight: wild-caught fish off Long Island, shellfish beds in its bays, fishing ports at Montauk, Shinnecock, Greenport and Freeport, import routes arriving at JFK airport and the Port of New York and New Jersey, and the Fulton Fish Market at Hunts Point in the Bronx">
+<rect width="800" height="610" class="paper"/>
+<g class="grat"><line x1="20.0" y1="0" x2="20.0" y2="610"/><line x1="60.4" y1="0" x2="60.4" y2="610"/><line x1="100.8" y1="0" x2="100.8" y2="610"/><line x1="141.3" y1="0" x2="141.3" y2="610"/><line x1="181.7" y1="0" x2="181.7" y2="610"/><line x1="222.1" y1="0" x2="222.1" y2="610"/><line x1="262.5" y1="0" x2="262.5" y2="610"/><line x1="302.9" y1="0" x2="302.9" y2="610"/><line x1="343.4" y1="0" x2="343.4" y2="610"/><line x1="383.8" y1="0" x2="383.8" y2="610"/><line x1="424.2" y1="0" x2="424.2" y2="610"/><line x1="464.6" y1="0" x2="464.6" y2="610"/><line x1="505.0" y1="0" x2="505.0" y2="610"/><line x1="545.5" y1="0" x2="545.5" y2="610"/><line x1="585.9" y1="0" x2="585.9" y2="610"/><line x1="626.3" y1="0" x2="626.3" y2="610"/><line x1="666.7" y1="0" x2="666.7" y2="610"/><line x1="707.1" y1="0" x2="707.1" y2="610"/><line x1="747.6" y1="0" x2="747.6" y2="610"/><line x1="788.0" y1="0" x2="788.0" y2="610"/><line x1="828.4" y1="0" x2="828.4" y2="610"/><line x1="0" y1="642.5" x2="800" y2="642.5"/><line x1="0" y1="587.5" x2="800" y2="587.5"/><line x1="0" y1="532.5" x2="800" y2="532.5"/><line x1="0" y1="477.5" x2="800" y2="477.5"/><line x1="0" y1="422.5" x2="800" y2="422.5"/><line x1="0" y1="367.5" x2="800" y2="367.5"/><line x1="0" y1="312.5" x2="800" y2="312.5"/><line x1="0" y1="257.5" x2="800" y2="257.5"/><line x1="0" y1="202.5" x2="800" y2="202.5"/><line x1="0" y1="147.5" x2="800" y2="147.5"/><line x1="0" y1="92.5" x2="800" y2="92.5"/><line x1="0" y1="37.5" x2="800" y2="37.5"/><line x1="0" y1="-17.5" x2="800" y2="-17.5"/></g>
+<polygon points="484.0,532.5 505.0,538.0 501.0,587.5 497.0,631.5 828.4,631.5 828.4,439.0 678.9,441.2 594.0,447.8 537.4,475.3 532.5,478.6 522.8,490.7 509.1,524.8" class="water"/><polygon points="108.9,270.7 92.8,290.5 68.5,312.5 39.4,337.8 -12.3,367.5 -12.3,257.5 96.8,255.3" class="water"/><polygon points="95.2,227.8 141.3,216.8 181.7,217.9 212.4,228.9 231.8,228.9 266.6,227.8 302.9,206.9 325.6,199.2 331.2,175.0 323.2,153.0 313.5,136.5 302.9,125.5 246.4,142.0 149.3,153.0 68.5,180.5 28.1,213.5 28.1,227.8" class="water"/>
+<polygon points="39.4,337.8 39.4,367.5 262.5,367.5 395.1,367.5 402.4,381.8 420.2,395.0 418.5,411.5 425.8,424.7 446.0,433.5 449.3,437.9 486.5,462.1 513.9,477.5 511.5,486.3 504.2,505.0 502.6,512.7 484.0,517.1 484.8,532.5 500.2,525.9 509.1,524.8 525.3,522.6 561.6,518.2 598.0,507.2 642.5,491.8 678.0,469.8 662.7,472.0 646.5,459.9 618.2,479.7 577.8,483.0 545.5,488.5 523.6,499.5 522.8,490.7 532.5,478.6 526.9,466.5 547.1,454.4 541.4,445.6 546.3,362.0 564.9,285.0 564.1,194.8 553.5,189.3 551.1,175.0 555.2,125.5 559.2,87.0 558.4,36.4 446.0,38.6 400.0,55.1 359.5,95.8 327.2,120.0 313.5,136.5 323.2,153.0 331.2,175.0 325.6,199.2 302.9,206.9 266.6,227.8 231.8,228.9 212.4,228.9 181.7,217.9 141.3,216.8 95.2,227.8 96.8,248.7 104.9,263.0 108.9,270.7 92.8,290.5 68.5,312.5 39.4,337.8" class="land"/><polygon points="39.4,337.8 39.4,367.5 262.5,367.5 395.1,367.5 402.4,381.8 420.2,395.0 418.5,411.5 425.8,424.7 446.0,433.5 449.3,437.9 486.5,462.1 513.9,477.5 511.5,486.3 504.2,505.0 502.6,512.7 484.0,517.1 484.8,532.5 500.2,525.9 509.1,524.8 525.3,522.6 561.6,518.2 598.0,507.2 642.5,491.8 678.0,469.8 662.7,472.0 646.5,459.9 618.2,479.7 577.8,483.0 545.5,488.5 523.6,499.5 522.8,490.7 532.5,478.6 526.9,466.5 547.1,454.4 541.4,445.6 546.3,362.0 564.9,285.0 564.1,194.8 553.5,189.3 551.1,175.0 555.2,125.5 559.2,87.0 558.4,36.4 446.0,38.6 400.0,55.1 359.5,95.8 327.2,120.0 313.5,136.5 323.2,153.0 331.2,175.0 325.6,199.2 302.9,206.9 266.6,227.8 231.8,228.9 212.4,228.9 181.7,217.9 141.3,216.8 95.2,227.8 96.8,248.7 104.9,263.0 108.9,270.7 92.8,290.5 68.5,312.5 39.4,337.8" class="landreg" transform="translate(3,3)"/>
+<g class="lakes"><polyline points="284.3,259.7 288.4,285.0 301.3,318.0"/><polyline points="266.6,271.8 270.6,301.5 273.0,325.7"/><polyline points="257.7,299.3 252.8,312.5 248.0,321.3"/><polyline points="239.9,271.8 235.8,294.9"/><polyline points="309.4,264.1 313.5,283.9"/><polyline points="300.5,268.5 303.8,287.2"/><polyline points="335.3,234.4 349.8,237.7 363.6,235.5"/></g>
+<g class="rivers"><polyline points="504.2,505.0 509.1,444.5 508.3,400.5 513.1,356.5 523.6,296.0 530.9,257.5 537.4,224.5"/><polyline points="527.7,281.7 488.9,268.5 448.5,259.7 404.0,246.5"/><polyline points="400.0,55.1 359.5,95.8 327.2,120.0"/><polyline points="553.5,189.3 551.1,175.0 555.2,125.5 559.2,87.0 558.4,37.5"/></g>
+<g><use href="#fish" x="690.1" y="442.0" width="15" height="8"/><use href="#fish" x="712.0" y="443.3" width="15" height="8"/><use href="#fish" x="777.5" y="444.0" width="15" height="8"/><use href="#fish" x="797.0" y="445.5" width="15" height="8"/><use href="#fish" x="581.4" y="457.9" width="15" height="8"/><use href="#fish" x="688.6" y="458.8" width="15" height="8"/><use href="#fish" x="737.0" y="460.3" width="15" height="8"/><use href="#fish" x="760.4" y="457.4" width="15" height="8"/><use href="#fish" x="782.4" y="458.5" width="15" height="8"/><use href="#fish" x="565.0" y="472.1" width="15" height="8"/><use href="#fish" x="603.3" y="471.7" width="15" height="8"/><use href="#fish" x="717.1" y="472.2" width="15" height="8"/><use href="#fish" x="678.7" y="487.4" width="15" height="8"/><use href="#fish" x="718.8" y="488.6" width="15" height="8"/><use href="#fish" x="764.5" y="488.4" width="15" height="8"/><use href="#fish" x="784.1" y="487.4" width="15" height="8"/><use href="#fish" x="616.0" y="505.2" width="15" height="8"/><use href="#fish" x="659.6" y="502.9" width="15" height="8"/><use href="#fish" x="748.2" y="501.3" width="15" height="8"/><use href="#fish" x="771.9" y="500.2" width="15" height="8"/><use href="#fish" x="797.7" y="503.1" width="15" height="8"/><use href="#fish" x="556.9" y="519.2" width="15" height="8"/><use href="#fish" x="578.8" y="518.8" width="15" height="8"/><use href="#fish" x="665.7" y="517.8" width="15" height="8"/><use href="#fish" x="689.4" y="520.5" width="15" height="8"/><use href="#fish" x="705.3" y="517.8" width="15" height="8"/><use href="#fish" x="730.5" y="517.1" width="15" height="8"/><use href="#fish" x="799.2" y="517.6" width="15" height="8"/><use href="#fish" x="512.3" y="533.2" width="15" height="8"/><use href="#fish" x="580.5" y="531.7" width="15" height="8"/><use href="#fish" x="623.1" y="532.8" width="15" height="8"/><use href="#fish" x="647.7" y="532.5" width="15" height="8"/><use href="#fish" x="670.2" y="531.8" width="15" height="8"/><use href="#fish" x="691.1" y="534.4" width="15" height="8"/><use href="#fish" x="733.3" y="530.8" width="15" height="8"/><use href="#fish" x="781.7" y="532.4" width="15" height="8"/><use href="#fish" x="515.3" y="545.4" width="15" height="8"/><use href="#fish" x="539.3" y="546.4" width="15" height="8"/><use href="#fish" x="564.1" y="546.9" width="15" height="8"/><use href="#fish" x="608.2" y="548.3" width="15" height="8"/><use href="#fish" x="672.2" y="549.8" width="15" height="8"/><use href="#fish" x="516.8" y="560.2" width="15" height="8"/><use href="#fish" x="562.0" y="564.3" width="15" height="8"/><use href="#fish" x="582.1" y="560.0" width="15" height="8"/><use href="#fish" x="611.6" y="562.7" width="15" height="8"/><use href="#fish" x="626.4" y="563.8" width="15" height="8"/><use href="#fish" x="672.7" y="563.4" width="15" height="8"/><use href="#fish" x="763.7" y="562.7" width="15" height="8"/><use href="#fish" x="785.8" y="561.1" width="15" height="8"/><use href="#fish" x="619.5" y="575.1" width="15" height="8"/><use href="#fish" x="641.0" y="578.4" width="15" height="8"/><use href="#fish" x="662.3" y="577.7" width="15" height="8"/><use href="#fish" x="751.5" y="579.1" width="15" height="8"/><use href="#fish" x="552.1" y="594.5" width="15" height="8"/><use href="#fish" x="578.4" y="595.0" width="15" height="8"/><use href="#fish" x="681.3" y="595.7" width="15" height="8"/><use href="#fish" x="707.6" y="593.6" width="15" height="8"/><use href="#fish" x="727.8" y="591.8" width="15" height="8"/><use href="#fish" x="621.7" y="608.5" width="15" height="8"/><use href="#fish" x="687.5" y="608.2" width="15" height="8"/><use href="#fish" x="776.8" y="610.4" width="15" height="8"/><use href="#fish" x="800.9" y="606.6" width="15" height="8"/><use href="#fish" x="3.1" y="273.7" width="15" height="8"/><use href="#fish" x="9.9" y="258.4" width="15" height="8"/><use href="#fish" x="22.4" y="279.4" width="15" height="8"/><use href="#fish" x="39.7" y="306.2" width="15" height="8"/><use href="#fish" x="54.7" y="275.6" width="15" height="8"/><use href="#fish" x="127.4" y="202.2" width="15" height="8"/><use href="#fish" x="208.6" y="211.4" width="15" height="8"/><use href="#fish" x="231.4" y="147.5" width="15" height="8"/><use href="#fish" x="90.6" y="218.9" width="15" height="8"/><use href="#fish" x="237.2" y="197.8" width="15" height="8"/><use href="#fish" x="228.7" y="175.0" width="15" height="8"/><use href="#fish" x="147.0" y="184.1" width="15" height="8"/></g>
+<use href="#oyster" x="571.8" y="505.5" width="12" height="10"/>
+<use href="#oyster" x="559.7" y="508.8" width="12" height="10"/>
+<use href="#oyster" x="583.9" y="502.2" width="12" height="10"/>
+<use href="#oyster" x="600.1" y="496.7" width="12" height="10"/>
+<use href="#oyster" x="624.3" y="479.1" width="12" height="10"/>
+<use href="#oyster" x="634.0" y="472.5" width="12" height="10"/>
+<use href="#oyster" x="537.8" y="483.5" width="12" height="10"/>
+<use href="#oyster" x="648.6" y="468.1" width="12" height="10"/>
+<use href="#oyster" x="547.5" y="509.9" width="12" height="10"/>
+<use href="#boat" x="661.8" y="453.8" width="18" height="14"/>
+<use href="#boat" x="628.6" y="450.5" width="18" height="14"/>
+<text x="579.6" y="450.5" class="clab">GREENPORT</text>
+<use href="#boat" x="618.9" y="479.1" width="18" height="14"/>
+<text x="623.9" y="511.1" class="clab">SHINNECOCK</text>
+<use href="#boat" x="530.0" y="503.3" width="18" height="14"/>
+<text x="529.0" y="535.3" class="clab">FREEPORT</text>
+<path d="M800 560 Q650 590 528.8 523.1" class="imp" id="rSalmon"/><use href="#plane" x="-13.0" y="-9.0" width="26" height="18" class="mover"><animateMotion dur="7s" begin="0s" repeatCount="indefinite" rotate="auto"><mpath href="#rSalmon"/></animateMotion><animate attributeName="opacity" dur="7s" begin="0s" repeatCount="indefinite" keyTimes="0;0.08;0.88;1" values="0;1;1;0"/></use><use href="#plane" x="-13.0" y="-9.0" width="26" height="18" class="mover"><animateMotion dur="7s" begin="-3.5s" repeatCount="indefinite" rotate="auto"><mpath href="#rSalmon"/></animateMotion><animate attributeName="opacity" dur="7s" begin="-3.5s" repeatCount="indefinite" keyTimes="0;0.08;0.88;1" values="0;1;1;0"/></use>
+<text class="arl"><textPath href="#salmonpath" startOffset="8%">← SALMON BY AIR: NORWAY · CHILE · CANADA</textPath></text><path id="salmonpath" d="M548 560 Q660 614 798 584" fill="none"/>
+<use href="#plane" x="512.8" y="515.1" width="20" height="14"/><text x="514.8" y="539.1" class="clab">JFK</text>
+<path d="M420 610 Q430 560 492.9 517.6" class="imp" id="rShrimp"/><use href="#ship" x="-15.0" y="-8.0" width="30" height="16" class="mover"><animateMotion dur="6s" begin="-1s" repeatCount="indefinite" rotate="0"><mpath href="#rShrimp"/></animateMotion><animate attributeName="opacity" dur="6s" begin="-1s" repeatCount="indefinite" keyTimes="0;0.08;0.88;1" values="0;1;1;0"/></use><use href="#ship" x="-15.0" y="-8.0" width="30" height="16" class="mover"><animateMotion dur="6s" begin="-4s" repeatCount="indefinite" rotate="0"><mpath href="#rShrimp"/></animateMotion><animate attributeName="opacity" dur="6s" begin="-4s" repeatCount="indefinite" keyTimes="0;0.08;0.88;1" values="0;1;1;0"/></use>
+<path d="M678.8 473.8 Q740 470 798 440" class="exp" id="rExport"/><use href="#boat" x="-9.0" y="-7.0" width="18" height="14" class="mover"><animateMotion dur="5s" begin="-0.5s" repeatCount="indefinite" rotate="0"><mpath href="#rExport"/></animateMotion><animate attributeName="opacity" dur="5s" begin="-0.5s" repeatCount="indefinite" keyTimes="0;0.08;0.88;1" values="0;1;1;0"/></use><use href="#boat" x="-9.0" y="-7.0" width="18" height="14" class="mover"><animateMotion dur="5s" begin="-3s" repeatCount="indefinite" rotate="0"><mpath href="#rExport"/></animateMotion><animate attributeName="opacity" dur="5s" begin="-3s" repeatCount="indefinite" keyTimes="0;0.08;0.88;1" values="0;1;1;0"/></use><text x="712" y="406" class="arl2">EXPORTS →</text><text x="704" y="420" class="arl3">SQUID · SCALLOPS</text>
+<use href="#city" x="508.7" y="470.4" width="26" height="24"/>
+<circle cx="524.4" cy="296.0" r="3.2" class="city"/><text x="529.4" y="292.0" class="clab">ALBANY</text>
+<circle cx="110.5" cy="269.6" r="3.2" class="city"/><text x="115.5" y="265.6" class="clab">BUFFALO</text>
+<circle cx="213.2" cy="239.9" r="3.2" class="city"/><text x="218.2" y="235.9" class="clab">ROCHESTER</text>
+<circle cx="331.2" cy="252.0" r="3.2" class="city"/><text x="336.2" y="248.0" class="clab">SYRACUSE</text>
+<text x="141.3" y="189.3" class="wlab" transform="rotate(-8 141.3 189.3)">LAKE ONTARIO</text>
+<text x="11.9" y="307.0" class="wlab" transform="rotate(-38 11.9 307.0)">LAKE ERIE</text>
+<text x="246.4" y="65.0" class="blab" transform="rotate(0 246.4 65.0)">CANADA</text>
+<text x="165.5" y="395.0" class="blab" transform="rotate(0 165.5 395.0)">PENNSYLVANIA</text>
+<text x="589.9" y="136.5" class="blab" transform="rotate(0 589.9 136.5)">VT</text>
+<text x="581.8" y="323.5" class="blab" transform="rotate(0 581.8 323.5)">MA</text>
+<text x="610.1" y="406.0" class="blab" transform="rotate(0 610.1 406.0)">CT</text>
+<text x="444.4" y="521.5" class="blab" transform="rotate(0 444.4 521.5)">NJ</text>
+<text x="565.7" y="470.9" class="alab" transform="rotate(-12 565.7 470.9)">LONG ISLAND SOUND</text>
+<text x="230.2" y="340.0" class="alab" transform="rotate(0 230.2 340.0)">UPSTATE · FISHED FOR SPORT, RARELY FOR SALE</text>
+<text x="598.0" y="538.0" class="alab" transform="rotate(0 598.0 538.0)">NEW YORK BIGHT · ATLANTIC</text>
+<g class="hot" tabindex="0"><polyline points="680,267 670.8,469.8" class="leader"/><circle cx="670.8" cy="469.8" r="4" class="pin"/><rect x="599" y="193" width="196" height="73" class="bxs"/><g class="lift"><rect x="596" y="190" width="196" height="73" class="bx"/><rect x="599" y="213" width="190" height="47" class="inr"/><rect x="596" y="190" width="196" height="20" class="bxh"/><text x="694.0" y="204.5" class="bxt">MONTAUK</text><text x="604" y="226" class="bl2">NEW YORK'S BIGGEST</text><text x="604" y="241" class="bl2">COMMERCIAL FISHING PORT</text><text x="604" y="256" class="bl3">SQUID · FLUKE · SCUP · TILEFISH</text><rect x="596" y="190" width="196" height="73" class="scan"/></g></g>
+<g class="hot" tabindex="0"><polyline points="462,440 514.7,498.4" class="leader"/><circle cx="514.7" cy="498.4" r="4" class="pin"/><rect x="289" y="411" width="176" height="88" class="bxs"/><g class="lift"><rect x="286" y="408" width="176" height="88" class="bx"/><rect x="289" y="431" width="170" height="62" class="inr"/><rect x="286" y="408" width="176" height="20" class="bxh"/><text x="374.0" y="422.5" class="bxt">FULTON FISH MARKET</text><text x="294" y="444" class="bl2">HUNTS POINT, THE BRONX</text><text x="294" y="459" class="bl2">BIGGEST WHOLESALE FISH</text><text x="294" y="474" class="bl2">MARKET IN THE U.S.</text><text x="294" y="489" class="bl3">OPEN ALL NIGHT</text><rect x="286" y="408" width="176" height="88" class="scan"/></g></g>
+<g class="hot" tabindex="0"><polyline points="467,223 509.1,411.5" class="leader"/><circle cx="509.1" cy="411.5" r="4" class="pin"/><rect x="395" y="153" width="150" height="73" class="bxs"/><g class="lift"><rect x="392" y="150" width="150" height="73" class="bx"/><rect x="395" y="173" width="144" height="47" class="inr"/><rect x="392" y="150" width="150" height="20" class="bxh"/><text x="467.0" y="164.5" class="bxt">HUDSON RIVER</text><text x="400" y="186" class="bl2">STRIPED BASS: CLOSED</text><text x="400" y="201" class="bl3">1976 (PCBs)</text><text x="400" y="216" class="bl2">SHAD: CLOSED 2010</text><rect x="392" y="150" width="150" height="73" class="scan"/></g></g>
+<g class="hot" tabindex="0"><polyline points="60,184 64.5,307.0" class="leader"/><circle cx="64.5" cy="307.0" r="4" class="pin"/><rect x="27" y="99" width="170" height="73" class="bxs"/><g class="lift"><rect x="24" y="96" width="170" height="73" class="bx"/><rect x="27" y="119" width="164" height="47" class="inr"/><rect x="24" y="96" width="170" height="20" class="bxh"/><text x="109.0" y="110.5" class="bxt">GREAT LAKES</text><text x="32" y="132" class="bl2">A FEW COMMERCIAL</text><text x="32" y="147" class="bl2">LICENSES, MOSTLY</text><text x="32" y="162" class="bl1">YELLOW PERCH</text><rect x="24" y="96" width="170" height="73" class="scan"/></g></g>
+<g class="hot" tabindex="0"><polyline points="350,555 492.9,511.6" class="leader"/><circle cx="492.9" cy="511.6" r="4" class="pin"/><rect x="173" y="533" width="180" height="58" class="bxs"/><g class="lift"><rect x="170" y="530" width="180" height="58" class="bx"/><rect x="173" y="553" width="174" height="32" class="inr"/><rect x="170" y="530" width="180" height="20" class="bxh"/><text x="260.0" y="544.5" class="bxt">PORT OF NY &amp; NJ</text><text x="178" y="566" class="bl1">FROZEN SHRIMP BY SHIP</text><text x="178" y="581" class="bl3">INDIA · INDONESIA · ECUADOR</text><rect x="170" y="530" width="180" height="58" class="scan"/></g></g>
+<g transform="translate(590,18)" class="hot" tabindex="0"><rect x="3" y="3" width="200" height="150" class="bxs"/><g class="lift"><rect width="200" height="150" class="bx"/><rect x="5" y="5" width="190" height="140" class="bxin"/><text x="100" y="28" class="kick">— THE SEAFOOD MAP OF —</text><text x="100" y="62" class="cart">NEW YORK</text><use href="#fish" x="22" y="78" width="22" height="12"/><text x="52" y="88" class="leg">WILD CATCH AT SEA</text><use href="#oyster" x="25" y="96" width="16" height="13"/><text x="52" y="107" class="leg">OYSTER &amp; CLAM BEDS</text><use href="#boat" x="23" y="112" width="20" height="16"/><text x="52" y="125" class="leg">FISHING PORT</text><path d="M20 138 h24" class="imp"/><text x="52" y="142" class="leg">IMPORT ROUTE</text><rect width="200" height="150" class="scan"/></g></g>
+<g transform="translate(770,300)" class="compass"><circle r="18"/><circle r="12" class="cin"/><path d="M0 -24 L5 0 L0 24 L-5 0Z"/><text y="-28" class="leg" text-anchor="middle">N</text></g>
+</svg>
+    </div>
+  </section>
+</main>
+<script>
+(function(){
+  var svg=document.querySelector('.map'), wrap=document.querySelector('.mapwrap');
+  if(!svg||!svg.pauseAnimations) return;
+  svg.pauseAnimations();
+  var still=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function go(){ if(!still) svg.unpauseAnimations(); }
+  function stop(){ svg.pauseAnimations(); }
+  wrap.addEventListener('pointerenter',function(e){ if(e.pointerType!=='touch') go(); });
+  wrap.addEventListener('pointerleave',function(e){ if(e.pointerType!=='touch') stop(); });
+  wrap.addEventListener('pointerup',function(e){ if(e.pointerType==='touch'){ svg.animationsPaused()?go():stop(); } });
+})();
+</script>
+</body>
+</html>
