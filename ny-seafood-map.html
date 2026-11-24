@@ -239,6 +239,10 @@ body{margin:0}
 .map .st:hover .land,.map .st:focus-visible .land{stroke:var(--blue)}
 .map .st:hover .scan,.map .st:focus-visible .scan{animation:flickin .35s steps(1) forwards,blink .7s steps(1) .35s infinite}
 @media (prefers-reduced-motion:reduce){.map .st .lift,.map .st .sts{transition:none}.map .st:hover .scan,.map .st:focus-visible .scan{animation:none;opacity:.8}}
+
+/* the map is a picture, not text: no drag-select highlight, no image dragging, no tap flash */
+.sheet,.map,.map *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.map{-webkit-user-drag:none}
 </style>
 <script>try{if(window.self!==window.top)document.documentElement.classList.add('embed')}catch(e){document.documentElement.classList.add('embed')}</script>
 </head>
@@ -333,7 +337,7 @@ body{margin:0}
 </svg>
     </div>
   </section>
-</main>
+</main><script>document.addEventListener('dragstart',function(e){if(e.target.closest&&e.target.closest('.map'))e.preventDefault()});</script>
 <script>
 (function(){
   var svg=document.querySelector('.map'), wrap=document.querySelector('.mapwrap');
